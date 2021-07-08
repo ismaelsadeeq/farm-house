@@ -17,13 +17,18 @@ module.exports = passport =>{
     jwtOption, async (jwt_payload, done)=>{
        const out =  await models.isLoggedOut.findOne(
          {
-          where:{userId:jwt_payload.id,status:true}
+          where:{adminId:jwt_payload.id,status:true}
          }
       )
+    //   const out2 =  await models.isLoggedOut.findOne(
+    //     {
+    //      where:{userId:jwt_payload.id,status:true}
+    //     }
+    //  )
       if(out){
         return done(null, false)
       } 
-      const user = await users.findOne(
+      const user = await admin.findOne(
         {
           where:{id:jwt_payload.id}
         }
