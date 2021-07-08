@@ -77,7 +77,10 @@ const adminLogin = async (req,res)=>{
     const email = data.email;
     const password = data.password;
     const admin = await models.admin.findOne(
-      {where:{email:email}}
+      {
+        where:{email:email},
+        attributes:['id','firstname','lastname','phoneNumber','email','password']
+      }
       );
     if (admin){
       const checkPassword = bcrypt.compareSync(password, admin.password);
@@ -87,10 +90,11 @@ const adminLogin = async (req,res)=>{
         return res.json(responseData)
       } else {
         const jwt_payload ={
-          id:user.id,
+          id:admin.id,
         }
-        await models.isLoggedOut.destroy({where:{adminId:user.id}}) 
+        await models.isLoggedOut.destroy({where:{adminId:admin.id}}) 
         const token = jwt.sign(jwt_payload,process.env.SECRET);
+        admin.password = null;
         return res.json(
           { "token":token,
             "data":admin,
@@ -105,7 +109,7 @@ const adminLogin = async (req,res)=>{
 };
 
 const logout = async(req,res)=>{
-  await models.isLoggedOut.create({id:uuid.v4(),userId:req.user.id,status:true});
+  await models.isLoggedOut.create({id:uuid.v4(),adminId:req.user.id,status:true});
   res.json("logged out");
 };
 const getAdmin = async  (req,res)=>{
@@ -114,7 +118,8 @@ const getAdmin = async  (req,res)=>{
     {
       where:{
         id:user.id
-      }
+      },
+      attributes:['id','firstname','lastname','phoneNumber','email']
     }
   );
   if(admin){

@@ -5,8 +5,6 @@ require('dotenv').config()
 
 const models = require('../models');
 
-const users = models.user;
-
 const jwtOption = {}
 jwtOption.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 
@@ -28,7 +26,7 @@ module.exports = passport =>{
       if(out){
         return done(null, false)
       } 
-      const user = await admin.findOne(
+      const user = await models.admin.findOne(
         {
           where:{id:jwt_payload.id}
         }

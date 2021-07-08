@@ -6,7 +6,7 @@ const responseData = {
 	data: null
 }
 
-const createSHFaccount = async (req,res) =>{
+const createSHFAccount = async (req,res) =>{
   const data = req.body;
   const user = req.user;
   const isAdmin = await models.admin.findOne(
@@ -39,7 +39,7 @@ const getSHFAccount = async (req,res)=>{
 }
 
 module.exports = {
-  createSHFaccount,
+  createSHFAccount,
   updateSHFAccount,
   deleteSHFAccount,
   getSHFAccount

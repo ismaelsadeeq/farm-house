@@ -4,9 +4,9 @@ module.exports = {
     await queryInterface.createTable('isLoggedOuts', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        unique:true,
+        type: Sequelize.UUID
       },
       adminId: {
         type: Sequelize.UUID,
