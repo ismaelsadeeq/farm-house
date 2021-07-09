@@ -18,20 +18,32 @@ module.exports = passport =>{
           where:{adminId:jwt_payload.id,status:true}
          }
       )
-    //   const out2 =  await models.isLoggedOut.findOne(
-    //     {
-    //      where:{userId:jwt_payload.id,status:true}
-    //     }
-    //  )
+      const out2 =  await models.isLoggedOut.findOne(
+        {
+         where:{farmerId:jwt_payload.id,status:true}
+        }
+     )
       if(out){
         return done(null, false)
-      } 
-      const user = await models.admin.findOne(
+      }
+      if(out2){
+        return done(null, false)
+      }  
+      const admin = await models.admin.findOne(
+        {
+          where:{id:jwt_payload.id}
+        }
+      );
+      const farmer = await models.farmer.findOne(
         {
           where:{id:jwt_payload.id}
         }
       )
-      if(user){
+      if(admin){
+        const user = admin
+        return done(null,user);
+      }else if(farmer){
+        const user = farmer
         return done(null,user);
       }
       return done(null,false);

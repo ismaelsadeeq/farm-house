@@ -12,11 +12,24 @@ router.post('/login',
   controller.adminLogin
 );
 
+router.post('/verify'
+  passport.authenticate('jwt',{session:false}),
+  controller.verifyEmail
+);
+router.post('/send-code',
+  controller.sendCode
+)
+router.post('/reset-password',
+  controller.resetPassword
+)
+router.post('/change-password', 
+  passport.authenticate('jwt',{session:false}),
+  controller.changePassword
+);
 router.post('/logout', 
   passport.authenticate('jwt',{session:false}),
   controller.logout
 );
-
 
 router.post('/', 
   controller.createAdmin

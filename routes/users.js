@@ -11,6 +11,9 @@ router.post('/',
   passport.authenticate('jwt',{session:false}),
   controller.createSHFAccount
 );
+router.post('/login',
+  controller.login
+);
 router.put('/',
   passport.authenticate('jwt',{session:false}),
   controller.updateSHFAccount
