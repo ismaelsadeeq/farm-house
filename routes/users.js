@@ -12,7 +12,7 @@ router.post('/',
   controller.createSHFAccount
 );
 router.post('/login',
-  controller.login
+  controller.farmerLogin
 );
 router.put('/',
   passport.authenticate('jwt',{session:false}),

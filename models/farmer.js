@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
   };
   farmer.associate = function(models){
     farmer.hasOne(models.isLoggedOut,{
-      foreignKey:'farmer'
+      foreignKey:'farmerId'
     });
   }
   farmer.init({

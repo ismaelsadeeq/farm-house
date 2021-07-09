@@ -234,7 +234,7 @@ const getSHFAccount = async (req,res)=>{
   res.json("Unauthorize");
 }
 
-const farmerLogin = (req,res) => {
+const farmerLogin =async (req,res) => {
   const data = req.body;
   const phoneNumber = data.phoneNumber;
   const pin = data.pin;
@@ -282,5 +282,6 @@ module.exports = {
   createSHFAccount,
   updateSHFAccount,
   deleteSHFAccount,
-  getSHFAccount
+  getSHFAccount,
+  farmerLogin
 }

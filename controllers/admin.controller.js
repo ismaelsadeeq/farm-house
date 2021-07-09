@@ -31,7 +31,6 @@ const createAdmin = async (req,res) =>{
     responseData.message = "empty post"
     return res.json(responseData)
   }
-  let msg;
   const checkAdmin = await models.admin.findOne({where:{email:data.email}});
   var admin = undefined;
 
