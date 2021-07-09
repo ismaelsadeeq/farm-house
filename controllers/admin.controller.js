@@ -76,8 +76,8 @@ const createAdmin = async (req,res) =>{
     "body":msg
   }
   data.val = val
-  await models.otpCode.create({id:uuid.v4(),code:val,adminId:user.id});
-  sendEmail(data)
+  await models.otpCode.create({id:uuid.v4(),code:val,adminId:admin.id});
+  // sendEmail(data)
   responseData.status = true
   responseData.message = "Account use the code sent the email provided to verify and set ppassword";
   return res.json(responseData);
@@ -193,7 +193,7 @@ const verifyEmail = async (req,res)=>{
       responseData.message = 'Account is already verified';
       return res.json(responseData);
     } 
-    if(data.passsword !== data.confirmPassword){
+    if(data.password !== data.confirmPassword){
       responseData.status = true;
       responseData.message = "Password does not match";
       return res.json(responseData);
@@ -203,16 +203,16 @@ const verifyEmail = async (req,res)=>{
     const hash = bcrypt.hashSync(data.password,salt)
     const userr = await models.admin.findOne(
       {
-        where:{id:code.userId}
+        where:{id:code.adminId}
       }
     );
-    await models.user.update(
+    await models.admin.update(
       {
         isVerified:true,
-        passsword:hash
+        password:hash
       },
       {
-        where:{id:code.userId}
+        where:{id:code.adminId}
       }
     );
     await models.otpCode.destroy(
@@ -238,7 +238,7 @@ const verifyEmail = async (req,res)=>{
       "summary": msg,
       "body":msg
     }
-    sendEmail(data)
+    // sendEmail(data)
     responseData.message = 'Account Verified';
     responseData.status = true;
     return res.json(responseData);

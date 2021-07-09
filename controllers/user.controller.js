@@ -1,6 +1,8 @@
 const uuid = require('uuid');
+const bcrypt = require('bcrypt')
 const models = require('../models')
 const multer = require('multer');
+const jwt = require('jsonwebtoken');
 const multerConfig = require('../config/multer');
 require('dotenv').config();
 const responseData = {
@@ -31,11 +33,23 @@ const createSHFAccount = async (req,res) =>{
         responseData.message = err
 				return res.json(responseData);
       } else if(req.body){
-        const data = req.body
+        const data = req.body;
+        const farmer = await models.farmer.findOne(
+          {
+            where:{
+              phoneNumber:data.phoneNumber
+            }
+          }
+        );
+        if(farmer){
+          responseData.message  = "Account already exist"
+          responseData.data = farmer;
+          return res.json(responseData);
+        }
         const createFarmer = await models.farmer.create(
           {
             id:uuid.v4(),
-            photoId:req.file,
+            photoId:req.file.path,
             //Biometrics
             firstname :data.firstname,
             lastname:data.lastname,
@@ -43,25 +57,26 @@ const createSHFAccount = async (req,res) =>{
             state:data.state,
             bvnNumber:data.bvnNumber,
             accountNumber:data.accountNumber,
+            bank:data.bank,
             phoneNumber:data.phoneNumber
           }
         )
         if(createFarmer){
-          res.statusCode = 200;
-          responseData.message  ="Account Created"
+          responseData.message  = "Account Created"
           responseData.data = createFarmer;
           return res.json(responseData);
         }
       }else{
-        res.statusCode = 200;
         responseData.message  ='empty post';
-        res.json(responseData);
+        return res.json(responseData);
       }
     })
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Unauthorize");
   }
-  responseData.status = false;
-  res.statusCode = false
-  res.json("Unauthorize");
+  
 }
 
 const updateSHFAccount = async (req,res)=>{
@@ -94,15 +109,17 @@ const updateSHFAccount = async (req,res)=>{
 				return res.json(responseData);
       } else if(req.body){
         const data = req.body
+        console.log(data.id)
         if(isUser){
           const createFarmer = await models.farmer.update(
             {
-              photoId:req.file,
+              photoId:req.file.path,
               //Biometrics
               firstname :data.firstname,
               lastname:data.lastname,
               address:data.address,
               state:data.state,
+              bank:data.bank,
               bvnNumber:data.bvnNumber,
               accountNumber:data.accountNumber,
               phoneNumber:data.phoneNumber
@@ -117,43 +134,43 @@ const updateSHFAccount = async (req,res)=>{
         {
           const createFarmer = await models.farmer.update(
             {
-              photoId:req.file,
+              photoId:req.file.path,
               //Biometrics
               firstname :data.firstname,
               lastname:data.lastname,
               address:data.address,
               state:data.state,
+              bank:data.bank,
               bvnNumber:data.bvnNumber,
               accountNumber:data.accountNumber,
               phoneNumber:data.phoneNumber
             },
             {
               where:{
-                id:req.body.id
+                id:data.id
               }
             }
           )
         }
-        if(createFarmer){
-          res.statusCode = 200;
-          responseData.message  ="Account Created"
-          responseData.data = createFarmer;
-          return res.json(responseData);
-        }
+        res.statusCode = 200;
+        responseData.message  = "Account updated"
+        return res.json(responseData);
       }else{
         res.statusCode = 200;
         responseData.message  ='empty post';
-        res.json(responseData);
+        return res.json(responseData);
       }
     })
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Unauthorize");
   }
-  responseData.status = false;
-  res.statusCode = false
-  res.json("Unauthorize");
 }
 
 const deleteSHFAccount = async (req,res)=>{
   const user = req.user;
+  const data =req.body;
   const isAdmin = await models.admin.findOne(
     {
       where:{
@@ -177,6 +194,7 @@ const deleteSHFAccount = async (req,res)=>{
           }
         }
       );
+
     }
     if(isAdmin){
       await models.farmer.destroy(
@@ -187,10 +205,15 @@ const deleteSHFAccount = async (req,res)=>{
         }
       );
     }
+    responseData.status = true;
+    res.statusCode = 200;
+    responseData.message = "Account deleted"
+    res.json(responseData);
+  }else{
+    responseData.status = false;
+    res.statusCode = 401
+    res.json("Unauthorize");
   }
-  responseData.status = false;
-  res.statusCode = false
-  res.json("Unauthorize");
 }
 
 const getSHFAccount = async (req,res)=>{
@@ -211,15 +234,12 @@ const getSHFAccount = async (req,res)=>{
   );
   if(isAdmin || isUser){
     if(isUser){
-    const user = await models.farmer.findOne(
-        {
-          where:{
-            id:user.id
-          }
-        }
-      );
+      responseData.message  = "completed"
+      responseData.data = isUser;
+      return res.json(responseData);
     }
     if(isAdmin){
+      const data = req.body
       const user = await models.farmer.findOne(
         {
           where:{
@@ -227,11 +247,14 @@ const getSHFAccount = async (req,res)=>{
           }
         }
       );
+      responseData.message  = "completed"
+      responseData.data = user;
+      return res.json(responseData);
     }
   }
   responseData.status = false;
   res.statusCode = false
-  res.json("Unauthorize");
+  return res.json("Unauthorize");
 }
 
 const farmerLogin =async (req,res) => {
@@ -278,10 +301,15 @@ const farmerLogin =async (req,res) => {
   responseData.message = "there is no farmer with this phoneNumber";
   return res.json(responseData);
 }
+const farmerLogout = async(req,res)=>{
+  await models.isLoggedOut.create({id:uuid.v4(),farmerId:req.user.id,status:true});
+  res.json("logged out");
+};
 module.exports = {
   createSHFAccount,
   updateSHFAccount,
   deleteSHFAccount,
   getSHFAccount,
-  farmerLogin
+  farmerLogin,
+  farmerLogout
 }

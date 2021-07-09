@@ -13,7 +13,6 @@ router.post('/login',
 );
 
 router.post('/verify',
-  passport.authenticate('jwt',{session:false}),
   controller.verifyEmail
 )
 

@@ -15,12 +15,15 @@ module.exports = {
         type: Sequelize.STRING
       },
       phoneNumber: {
+        allowNull: false,
+        unique:true,
         type: Sequelize.STRING
       },
       photoId: {
         type: Sequelize.STRING
       },
       Biometric: {
+        unique:true,
         type: Sequelize.STRING
       },
       address: {
@@ -30,12 +33,14 @@ module.exports = {
         type: Sequelize.STRING
       },
       bvnNumber: {
+        unique:true,
         type: Sequelize.STRING
       },
       accountNumber: {
+        unique:true,
         type: Sequelize.STRING
       },
-      phoneNumber: {
+      bank: {
         type: Sequelize.STRING
       },
       pin: {

@@ -7,12 +7,16 @@ router.get('/',
   passport.authenticate('jwt',{session:false}),
   controller.getSHFAccount
 );
-router.post('/',
+router.post('/create',
   passport.authenticate('jwt',{session:false}),
   controller.createSHFAccount
 );
 router.post('/login',
   controller.farmerLogin
+);
+router.post('/logout',
+  passport.authenticate('jwt',{session:false}),
+  controller.farmerLogout
 );
 router.put('/',
   passport.authenticate('jwt',{session:false}),

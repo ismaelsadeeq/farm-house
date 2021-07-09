@@ -18,16 +18,6 @@ module.exports = {
           as:'adminId'
         }
       },
-      farmerId: {
-        type: Sequelize.UUID,
-        allowNull:false,
-        onDelete:'CASCADE',
-        references:{
-          model:'farmers',
-          key:'id',
-          as:'farmerId'
-        }
-      },
       code: {
         type: Sequelize.STRING
       },
