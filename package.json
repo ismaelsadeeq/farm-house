@@ -20,6 +20,7 @@
     "node-mailjet": "^3.3.4",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
+    "request": "^2.88.2",
     "sequelize": "^6.6.5",
     "uuid": "^8.3.2"
   }

@@ -1,9 +1,11 @@
 const uuid = require('uuid');
 const bcrypt = require('bcrypt')
+const helpers = require('../utilities/helpers');
 const models = require('../models')
 const multer = require('multer');
 const jwt = require('jsonwebtoken');
 const multerConfig = require('../config/multer');
+const smsGlobal = require('../utilities/sms.api')
 require('dotenv').config();
 const responseData = {
 	status: true,
@@ -57,6 +59,7 @@ const createSHFAccount = async (req,res) =>{
             state:data.state,
             bvnNumber:data.bvnNumber,
             accountNumber:data.accountNumber,
+            hasPin :false,
             bank:data.bank,
             phoneNumber:data.phoneNumber
           }
@@ -269,6 +272,22 @@ const farmerLogin =async (req,res) => {
     }
   );
   if(farmer){
+    const hasPin = farmer.hasPin;
+    if(!hasPin){
+      const code = helpers.generateOTP();
+      const phoneNumber = farmer.phoneNumber;
+      await smsGlobal.sendMessage(process.env.FARMER_HQ_NUMBER,phoneNumber,code);
+      await models.otpCode.create(
+        {
+          id:uuid.v4(),
+          code:code,
+          farmerId:farmer.id
+        }
+      );
+      responseData.message = `A code was sent to ${phoneNumber}`;
+      responseData.status = false ;
+      return res.json(responseData);
+    }
     const checkPin = bcrypt.compareSync(pin, farmer.pin);
     if (!checkPin) {
       responseData.message = 'Incorrect pin';
@@ -301,6 +320,53 @@ const farmerLogin =async (req,res) => {
   responseData.message = "there is no farmer with this phoneNumber";
   return res.json(responseData);
 }
+
+const createPin = async (req,res) =>{
+  const data = req.body;
+  const code = data.code;
+  const isCode = await models.otpCode.findOne(
+    {
+      where:{
+        code:code
+      }
+    }
+  );
+  if(isCode){
+    if(!data.pin == data.confirmPin){
+      responseData.message = 'pin and cornfirm pin doesn\'t match';
+      responseData.status = false;
+      return res.json(responseData)
+    }
+    const saltRounds = 10;
+    const salt = bcrypt.genSaltSync(saltRounds);
+    const hash = bcrypt.hashSync(data.pin,salt)
+    const updateFarmer = await models.farmer.update(
+      {
+        hasPin:true,
+        pin:hash
+      },
+      {
+        where:{
+          id:isCode.farmerId
+        }
+      }
+    );
+    const deleteCode = await models.otpCode.destroy(
+      {
+        where:{
+          code:data.code
+        }
+      }
+    );
+    responseData.message = 'Pin set go to login';
+    responseData.status = false;
+    return res.json(responseData)
+  }
+  responseData.message = 'Incorrect pin';
+  responseData.status = false;
+  return res.json(responseData)
+}
+
 const farmerLogout = async(req,res)=>{
   await models.isLoggedOut.create({id:uuid.v4(),farmerId:req.user.id,status:true});
   res.json("logged out");
@@ -311,5 +377,6 @@ module.exports = {
   deleteSHFAccount,
   getSHFAccount,
   farmerLogin,
-  farmerLogout
+  farmerLogout,
+  createPin
 }

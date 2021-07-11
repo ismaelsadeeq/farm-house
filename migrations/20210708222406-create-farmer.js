@@ -43,6 +43,9 @@ module.exports = {
       bank: {
         type: Sequelize.STRING
       },
+      hasPin : {
+        type: Sequelize.BOOLEAN
+      },
       pin: {
         type: Sequelize.STRING
       },

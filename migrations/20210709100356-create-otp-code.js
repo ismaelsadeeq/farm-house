@@ -10,12 +10,22 @@ module.exports = {
       },
       adminId: {
         type: Sequelize.UUID,
-        allowNull:false,
+        allowNull:true,
         onDelete:'CASCADE',
         references:{
           model:'admins',
           key:'id',
           as:'adminId'
+        }
+      },
+      farmerId: {
+        type: Sequelize.UUID,
+        allowNull:true,
+        onDelete:'CASCADE',
+        references:{
+          model:'farmers',
+          key:'id',
+          as:'farmerId'
         }
       },
       code: {

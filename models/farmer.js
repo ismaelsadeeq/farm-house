@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
     farmer.hasOne(models.isLoggedOut,{
       foreignKey:'farmerId'
     });
+    farmer.hasMany(models.otpCode,{
+      foreignKey:'farmerId'
+    });
   }
   farmer.init({
     firstname: DataTypes.STRING,
@@ -21,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     bvnNumber: DataTypes.STRING,
     bank:DataTypes.STRING,
     accountNumber: DataTypes.STRING,
+    hasPin : DataTypes.BOOLEAN,
     pin: DataTypes.STRING
   }, {
     sequelize,

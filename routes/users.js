@@ -14,6 +14,9 @@ router.post('/create',
 router.post('/login',
   controller.farmerLogin
 );
+router.post('/create-pin',
+  controller.createPin
+);
 router.post('/logout',
   passport.authenticate('jwt',{session:false}),
   controller.farmerLogout
