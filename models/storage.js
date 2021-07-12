@@ -19,7 +19,9 @@ module.exports = (sequelize, DataTypes) => {
   storage.init({
     productName: DataTypes.STRING,
     numberOfProduct: DataTypes.STRING,
-    unit: DataTypes.STRING
+    unit: DataTypes.STRING,
+    dateStoredString: DataTypes.STRING,
+    dateStored :DataTypes.DATE
   }, {
     sequelize,
     paranoid:true,

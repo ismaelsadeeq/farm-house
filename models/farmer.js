@@ -15,6 +15,9 @@ module.exports = (sequelize, DataTypes) => {
     farmer.hasMany(models.storage,{
       foreignKey:'farmerId'
     });
+    farmer.hasMany(models.productWidrawal,{
+      foreignKey:'farmerId'
+    });
   }
   farmer.init({
     firstname: DataTypes.STRING,

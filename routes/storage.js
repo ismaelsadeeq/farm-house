@@ -23,7 +23,7 @@ router.get('all',
   passport.authenticate('jwt',{session:false}),
   controller.getAllStorage
 );
-router.post('/widraw',
+router.post('/widraw/:id',
   passport.authenticate('jwt',{session:false}),
   controller.widthraw
 );

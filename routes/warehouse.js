@@ -8,7 +8,7 @@ router.post('/',
   controller.createWarehouse
 );
 
-router.put('/',
+router.put('/:id',
   passport.authenticate('jwt',{session:false}),
   controller.editWarehouse
 );

@@ -8,7 +8,7 @@ module.exports = {
         unique:true,
         type: Sequelize.UUID
       },
-      strageId: {
+      storageId: {
         type: Sequelize.UUID,
         allowNull:false,
         onDelete:'CASCADE',
@@ -16,6 +16,16 @@ module.exports = {
           model:'storages',
           key:'id',
           as:'storageId'
+        }
+      },
+      farmerId: {
+        type: Sequelize.UUID,
+        allowNull:false,
+        onDelete:'CASCADE',
+        references:{
+          model:'farmers',
+          key:'id',
+          as:'farmerId'
         }
       },
       periodOfStorage: {

@@ -7,7 +7,7 @@ router.post('/',
   passport.authenticate('jwt',{session:false}),
   controller.createCenter
 );
-router.pust('/',
+router.put('/:id',
   passport.authenticate('jwt',{session:false}),
   controller.editCenter
 );
@@ -19,7 +19,7 @@ router.get('/all',
   passport.authenticate('jwt',{session:false}),
   controller.getAllCenter
 );
-router.delete('/',
+router.delete('/:id',
   passport.authenticate('jwt',{session:false}),
   controller.deleteCenter
 );

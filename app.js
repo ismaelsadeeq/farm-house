@@ -30,6 +30,7 @@ var adminRouter = require('./routes/admin');
 var storageRouter = require('./routes/storage');
 var warehouseRouter = require('./routes/warehouse');
 var processingCenter = require('./routes/processingCenter');
+var widthrawals = require('./routes/widrawals')
 
 
 app.use('/api/v1', indexRouter);
@@ -38,6 +39,7 @@ app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/storage', storageRouter);
 app.use('/api/v1/warehouse', warehouseRouter);
 app.use('/api/v1/mini-processing-center', processingCenter);
+app.use('/api/v1/product-widthrawal', widthrawals)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

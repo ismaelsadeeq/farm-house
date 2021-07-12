@@ -37,6 +37,12 @@ module.exports = {
       unit: {
         type: Sequelize.STRING
       },
+      dateStored : {
+        type: Sequelize.DATE
+      },
+      dateStoredString :{
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

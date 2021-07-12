@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
     productWidthrawal.belongsTo(models.storage,{
       foreignKey:'storageId'
     });
+    productWidthrawal.belongsTo(models.farmer,{
+      foreignKey:'farmerId'
+    });
   }
   productWidthrawal.init({
     periodOfStorage: DataTypes.STRING,
