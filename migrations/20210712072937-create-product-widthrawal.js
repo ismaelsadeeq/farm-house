@@ -8,14 +8,14 @@ module.exports = {
         unique:true,
         type: Sequelize.UUID
       },
-      storageId: {
+      productStorageId: {
         type: Sequelize.UUID,
         allowNull:false,
         onDelete:'CASCADE',
         references:{
-          model:'storages',
+          model:'productStorages',
           key:'id',
-          as:'storageId'
+          as:'productStorageId'
         }
       },
       farmerId: {

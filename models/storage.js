@@ -3,20 +3,20 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class storage extends Model {
+  class productStorage extends Model {
   };
-  storage.associate = function(models){
-    storage.belongsTo(models.farmer,{
+  productStorage.associate = function(models){
+    productStorage.belongsTo(models.farmer,{
       foreignKey:'farmerId'
     });
-    storage.belongsTo(models.warehouse,{
+    productStorage.belongsTo(models.warehouse,{
       foreignKey:'warehouseId'
     });
-    storage.hasMany(models.productWidthrawal,{
-      foreignKey:'storageId'
+    productStorage.hasMany(models.productWidthrawal,{
+      foreignKey:'productStorageId'
     });
   }
-  storage.init({
+  productStorage.init({
     productName: DataTypes.STRING,
     numberOfProduct: DataTypes.STRING,
     unit: DataTypes.STRING,
@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     paranoid:true,
-    modelName: 'storage',
+    modelName: 'productStorage',
   });
-  return storage;
+  return productStorage;
 };

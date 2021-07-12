@@ -25,7 +25,7 @@ const storeProduct = async (req,res)=>{
     const data = req.body;
     let dateStored = new Date();
     let dateStoredString = dateStored.toLocaleString();
-    const store = await models.storage.create(
+    const productStore = await models.productStorage.create(
       {
         id:uuid.v4(),
         farmerId:data.farmerId,
@@ -37,7 +37,7 @@ const storeProduct = async (req,res)=>{
         dateStoredString:dateStoredString
       }
     );
-    if(!store) {
+    if(!productStore) {
       responseData.message = "something went wrong";
       responseData.status = false;
       responseData.data = null;
@@ -45,7 +45,8 @@ const storeProduct = async (req,res)=>{
     }
     responseData.message = "storage created";
     responseData.status = true;
-    responseData.data = store;
+    responseData.data = productStore;
+    return res.json(responseData)
   } else{
     responseData.status = false;
     res.statusCode = 401
@@ -64,7 +65,7 @@ const getAStorage = async (req,res)=>{
     }
   );
   if(isAdmin){
-    const store = await models.storage.findOne(
+    const store = await models.productStorage.findOne(
       {
         where:{
           id:id
@@ -108,7 +109,7 @@ const getFarmerStorage = async (req,res)=>{
     const pageLimit = parseInt(req.query.pageLimit);
 
     const skip = currentPage * pageLimit;
-    const store = await models.storage.findAll(
+    const store = await models.productStorage.findAll(
       {
         order:[['createdAt','DESC']],
         offset:skip,
@@ -155,7 +156,7 @@ const getWarehouseStorage = async (req,res)=>{
     const pageLimit = parseInt(req.query.pageLimit);
 
     const skip = currentPage * pageLimit;
-    const store = await models.storage.findAll(
+    const store = await models.productStorage.findAll(
       {
         order:[['createdAt','DESC']],
         offset:skip,
@@ -201,7 +202,7 @@ const getAllStorage = async (req,res)=>{
     const pageLimit = parseInt(req.query.pageLimit);
 
     const skip = currentPage * pageLimit;
-    const store = await models.storage.findAll(
+    const store = await models.productStorage.findAll(
       {
         order:[['createdAt','DESC']],
         offset:skip,
@@ -232,7 +233,6 @@ const getAllStorage = async (req,res)=>{
 
 const widthraw = async (req,res)=>{
   const user = req.user;
-  const id = req.params.id;
   const isAdmin = await models.admin.findOne(
     {
       where:{
@@ -243,7 +243,7 @@ const widthraw = async (req,res)=>{
   if(isAdmin){
     const data = req.body;
     const storageId = req.params.id;
-    const storage = await models.storage.findOne(
+    const storage = await models.productStorage.findOne(
       {
         where:{
           id:storageId
@@ -252,7 +252,7 @@ const widthraw = async (req,res)=>{
     );
     let numberOfProducts = data.numberOfProducts;
     let newProductNumber = parseInt(storage.numberOfProduct) - parseInt(numberOfProducts);
-    await models.storage.update(
+    await models.productStorage.update(
       {
         numberOfProduct:newProductNumber
       },
@@ -264,24 +264,28 @@ const widthraw = async (req,res)=>{
     );
     let currentDate = new Date();
     let dateStored = storage.dateStored;
-    let periodOfStorage = currentDate - dateStored
+  
+    let periodOfStorage = helpers.getDifferenceInDays(dateStored,currentDate);
+    periodOfStorage = Math.floor(periodOfStorage);
     const productWidthrawal = await models.productWidthrawal.create(
       {
         id:uuid.v4(),
-        storageId:storage.id,
+        productStorageId:storageId,
         farmerId:storage.farmerId,
         widthrawalReason:data.widthrawalReason,
         numberOfProductWidthrawed:numberOfProducts,
-        periodOfStorage:periodOfStorage
+        periodOfStorage:`${periodOfStorage} Days`
       }
     );
     if(!productWidthrawal){
       responseData.message = "completed";
       responseData.status = true;
+      return res.json(responseData)
     }
     responseData.message = "completed";
     responseData.status = true;
     responseData.data = productWidthrawal;
+    return res.json(responseData)
   } else{
     responseData.status = false;
     res.statusCode = 401

@@ -6,8 +6,8 @@ module.exports = (sequelize, DataTypes) => {
   class productWidthrawal extends Model {
   };
   productWidthrawal.associate = function(models){
-    productWidthrawal.belongsTo(models.storage,{
-      foreignKey:'storageId'
+    productWidthrawal.belongsTo(models.productStorage,{
+      foreignKey:'productStorageId'
     });
     productWidthrawal.belongsTo(models.farmer,{
       foreignKey:'farmerId'

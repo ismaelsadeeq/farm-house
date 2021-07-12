@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     farmer.hasMany(models.otpCode,{
       foreignKey:'farmerId'
     });
-    farmer.hasMany(models.storage,{
+    farmer.hasMany(models.productStorage,{
       foreignKey:'farmerId'
     });
     farmer.hasMany(models.productWidthrawal,{

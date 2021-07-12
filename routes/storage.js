@@ -3,6 +3,15 @@ var router = express.Router();
 const passport = require('passport');
 const controller = require('../controllers/storage.controller');
 
+router.get('/all',
+  passport.authenticate('jwt',{session:false}),
+  controller.getAllStorage
+);
+
+router.post('/widthraw/:id',
+  passport.authenticate('jwt',{session:false}),
+  controller.widthraw
+);
 router.post('/store',
   passport.authenticate('jwt',{session:false}),
   controller.storeProduct
@@ -19,14 +28,7 @@ router.get('/warehouse/:id',
   passport.authenticate('jwt',{session:false}),
   controller.getWarehouseStorage
 );
-router.get('all',
-  passport.authenticate('jwt',{session:false}),
-  controller.getAllStorage
-);
-router.post('/widraw/:id',
-  passport.authenticate('jwt',{session:false}),
-  controller.widthraw
-);
+
 
 
 router.p
