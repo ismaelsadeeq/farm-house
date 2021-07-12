@@ -13,7 +13,7 @@ router.put('/:id',
   controller.editWarehouse
 );
 
-router.get('/',
+router.get('/all',
   passport.authenticate('jwt',{session:false}),
   controller.getWarehouses
 );

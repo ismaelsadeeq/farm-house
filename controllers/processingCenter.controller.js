@@ -64,7 +64,7 @@ const editCenter = async (req,res)=>{
   );
   if(isAdmin){
     const data = req.body;
-    const miniProcessingCenter = await models.miniProcessingCenter.create(
+    const miniProcessingCenter = await models.miniProcessingCenter.update(
       {
         name:data.name,
         state:data.state,

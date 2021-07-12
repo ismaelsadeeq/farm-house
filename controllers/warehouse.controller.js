@@ -64,7 +64,7 @@ const editWarehouse = async (req,res)=>{
   );
   if(isAdmin){
     const data = req.body;
-    const warehouse = await models.warehouse.create(
+    const warehouse = await models.warehouse.update(
       {
         name:data.name,
         state:data.state,
@@ -104,7 +104,7 @@ const getWarehouses = async (req,res)=>{
     const pageLimit = parseInt(req.query.pageLimit);
 
     const skip = currentPage * pageLimit;
-    const count = await models.miniProcessingCenter.count();
+    const count = await models.warehouse.count();
     const warehouse = await models.warehouse.findAll(
       {
         order:[['createdAt','DESC']],
@@ -115,6 +115,7 @@ const getWarehouses = async (req,res)=>{
       
     );
     if(!warehouse) {
+      console.log("heyyy")
       responseData.message = "something went wrong";
       responseData.status = false;
       responseData.data = null;
@@ -158,7 +159,7 @@ const getWarehouse = async (req,res)=>{
       responseData.data = null;
       return res.json(responseData)  
     }
-    responseData.message = "mini processing center created";
+    responseData.message = "completed";
     responseData.status = true;
     responseData.data = warehouse;
     return res.json(responseData)
@@ -196,7 +197,6 @@ const deleteWarehouse = async (req,res)=>{
     }
     responseData.message = "warehouse center deleted";
     responseData.status = true;
-    responseData.data = warehouse;
     return res.json(responseData)
   } else{
     responseData.status = false;

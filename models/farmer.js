@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     farmer.hasMany(models.storage,{
       foreignKey:'farmerId'
     });
-    farmer.hasMany(models.productWidrawal,{
+    farmer.hasMany(models.productWidthrawal,{
       foreignKey:'farmerId'
     });
   }
