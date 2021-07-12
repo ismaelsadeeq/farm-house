@@ -12,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
     farmer.hasMany(models.otpCode,{
       foreignKey:'farmerId'
     });
+    farmer.hasMany(models.storage,{
+      foreignKey:'farmerId'
+    });
   }
   farmer.init({
     firstname: DataTypes.STRING,

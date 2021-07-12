@@ -27,11 +27,17 @@ require('./config/passport')(passport);
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var adminRouter = require('./routes/admin');
+var storageRouter = require('./routes/storage');
+var warehouseRouter = require('./routes/warehouse');
+var processingCenter = require('./routes/processingCenter');
 
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/admin', adminRouter);
+app.use('/api/v1', indexRouter);
+app.use('/api/v1/users', usersRouter);
+app.use('/api/v1/admin', adminRouter);
+app.use('/api/v1/storage', storageRouter);
+app.use('/api/v1/warehouse', warehouseRouter);
+app.use('/api/v1/mini-processing-center', processingCenter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
