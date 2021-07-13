@@ -1,26 +1,26 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('isLoggedOuts', {
+    await queryInterface.createTable('processedCommodities', {
       id: {
         allowNull: false,
         primaryKey: true,
         unique:true,
         type: Sequelize.UUID
       },
-      adminId: {
+      processingCenterId: {
         type: Sequelize.UUID,
-        allowNull:true,
+        allowNull:false,
         onDelete:'CASCADE',
         references:{
-          model:'admins',
+          model:'miniProcessingCenters',
           key:'id',
-          as:'adminId'
+          as:'processingCenterId'
         }
       },
       farmerId: {
         type: Sequelize.UUID,
-        allowNull:true,
+        allowNull:false,
         onDelete:'CASCADE',
         references:{
           model:'farmers',
@@ -28,17 +28,16 @@ module.exports = {
           as:'farmerId'
         }
       },
-      superAdminId: {
-        type: Sequelize.UUID,
-        allowNull:true,
-        onDelete:'CASCADE',
-        references:{
-          model:'superAdmins',
-          key:'id',
-          as:'superAdminId'
-        }
+      commodityName: {
+        type: Sequelize.STRING
       },
-      status: {
+      commodityQuantity: {
+        type: Sequelize.STRING
+      },
+      commodityUnit: {
+        type: Sequelize.STRING
+      },
+      isProcessed: {
         type: Sequelize.BOOLEAN
       },
       createdAt: {
@@ -55,6 +54,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('isLoggedOuts');
+    await queryInterface.dropTable('processedCommodities');
   }
 };

@@ -37,6 +37,9 @@ module.exports = {
       unit: {
         type: Sequelize.STRING
       },
+      isForSale : {
+        type : Sequelize.STRING
+      },
       dateStored : {
         type: Sequelize.DATE
       },

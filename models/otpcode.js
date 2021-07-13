@@ -12,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
     otpCode.belongsTo(models.farmer,{
       foreignKey:'farmerId'
     });
+    otpCode.belongsTo(models.superAdmin, {
+      foreignKey:'superAdminId'
+    })
   }
   otpCode.init({
     code: DataTypes.STRING

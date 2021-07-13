@@ -12,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
     isLoggedOut.belongsTo(models.farmer,{
       foreignKey:'farmerId'
     });
+    isLoggedOut.belongsTo(models.superAdmin,{
+      foreignKey:'superAdminId'
+    });
   }
   isLoggedOut.init({
     status: DataTypes.BOOLEAN

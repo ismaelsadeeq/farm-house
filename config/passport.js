@@ -22,11 +22,19 @@ module.exports = passport =>{
         {
          where:{farmerId:jwt_payload.id,status:true}
         }
-     )
+      )
+      const out3 =  await models.isLoggedOut.findOne(
+        {
+         where:{superAdminId:jwt_payload.id,status:true}
+        }
+      )
       if(out){
         return done(null, false)
       }
       if(out2){
+        return done(null, false)
+      }
+      if(out3){
         return done(null, false)
       }  
       const admin = await models.admin.findOne(
@@ -39,8 +47,16 @@ module.exports = passport =>{
           where:{id:jwt_payload.id}
         }
       )
+      const superAdmin = await models.superAdmin.findOne(
+        {
+          where:{id:jwt_payload.id}
+        }
+      )
       if(admin){
         const user = admin
+        return done(null,user);
+      }else if(superAdmin){
+        const user = superAdmin
         return done(null,user);
       }else if(farmer){
         const user = farmer

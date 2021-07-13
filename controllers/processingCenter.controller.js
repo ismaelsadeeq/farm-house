@@ -99,7 +99,14 @@ const getCenter = async (req,res)=>{
       }
     }
   );
-  if(isAdmin){
+  const isSuperAdmin = await models.superAdmin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin || isSuperAdmin){
     const miniProcessingCenter = await models.miniProcessingCenter.findOne(
       {
         where:{
@@ -135,7 +142,14 @@ const getAllCenter = async (req,res)=>{
       }
     }
   );
-  if(isAdmin){
+  const isSuperAdmin = await models.superAdmin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin || isSuperAdmin){
     const currentPage = parseInt(req.query.currentPage);
     const pageLimit = parseInt(req.query.pageLimit);
 

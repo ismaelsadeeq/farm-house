@@ -259,6 +259,47 @@ const getSHFAccount = async (req,res)=>{
   res.statusCode = false
   return res.json("Unauthorize");
 }
+const getAllSHFAccount = async (req,res)=>{
+  const user = req.user;
+  const isAdmin = await models.admin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  const isSuperAdmin = await models.superAdmin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin || isSuperAdmin){
+    const data = req.body;
+    const currentPage = parseInt(req.query.currentPage);
+    const pageLimit = parseInt(req.query.pageLimit);
+
+    const skip = currentPage * pageLimit;
+    const count = await models.farmer.count();
+    const farmers = await models.farmer.findAll(
+      {
+        order:[['createdAt','DESC']],
+        offset:skip,
+        limit:pageLimit,
+      }
+    );
+    responseData.message  = "completed"
+    responseData.data = farmers;
+    responseData.numberOfFarmers = count;
+    return res.json(responseData);
+  
+  }
+  responseData.status = false;
+  res.statusCode = false
+  return res.json("Unauthorize");
+}
+
 
 const farmerLogin =async (req,res) => {
   const data = req.body;
@@ -376,6 +417,7 @@ module.exports = {
   updateSHFAccount,
   deleteSHFAccount,
   getSHFAccount,
+  getAllSHFAccount,
   farmerLogin,
   farmerLogout,
   createPin

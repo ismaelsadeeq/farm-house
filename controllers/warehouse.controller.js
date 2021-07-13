@@ -99,7 +99,14 @@ const getWarehouses = async (req,res)=>{
       }
     }
   );
-  if(isAdmin){
+  const isSuperAdmin = await models.superAdmin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin || isSuperAdmin){
     const currentPage = parseInt(req.query.currentPage);
     const pageLimit = parseInt(req.query.pageLimit);
 
@@ -115,7 +122,6 @@ const getWarehouses = async (req,res)=>{
       
     );
     if(!warehouse) {
-      console.log("heyyy")
       responseData.message = "something went wrong";
       responseData.status = false;
       responseData.data = null;
@@ -143,7 +149,14 @@ const getWarehouse = async (req,res)=>{
       }
     }
   );
-  if(isAdmin){
+  const isSuperAdmin = await models.superAdmin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin || isSuperAdmin){
     const warehouse = await models.warehouse.findOne(
       {
         where:{

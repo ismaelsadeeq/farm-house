@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     productName: DataTypes.STRING,
     numberOfProduct: DataTypes.STRING,
     unit: DataTypes.STRING,
+    isForSale:DataTypes.BOOLEAN,
     dateStoredString: DataTypes.STRING,
     dateStored :DataTypes.DATE
   }, {

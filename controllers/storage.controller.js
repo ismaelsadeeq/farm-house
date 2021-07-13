@@ -64,7 +64,14 @@ const getAStorage = async (req,res)=>{
       }
     }
   );
-  if(isAdmin){
+  const isSuperAdmin = await models.superAdmin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin || isSuperAdmin){
     const store = await models.productStorage.findOne(
       {
         where:{
@@ -151,7 +158,14 @@ const getWarehouseStorage = async (req,res)=>{
       }
     }
   );
-  if(isAdmin){
+  const isSuperAdmin = await models.superAdmin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin || isSuperAdmin){
     const currentPage = parseInt(req.query.currentPage);
     const pageLimit = parseInt(req.query.pageLimit);
 
@@ -197,7 +211,14 @@ const getAllStorage = async (req,res)=>{
       }
     }
   );
-  if(isAdmin){
+  const isSuperAdmin = await models.superAdmin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin || isSuperAdmin){
     const currentPage = parseInt(req.query.currentPage);
     const pageLimit = parseInt(req.query.pageLimit);
 

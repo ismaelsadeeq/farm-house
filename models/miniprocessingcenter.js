@@ -5,6 +5,11 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class miniProcessingCenter extends Model {
   };
+  miniProcessingCenter.associate = function(models){
+    miniProcessingCenter.hasMany(models.processedCommodity,{
+      foreignKey:'processingCenterId'
+    });
+  }
   miniProcessingCenter.init({
     name: DataTypes.STRING,
     state: DataTypes.STRING,

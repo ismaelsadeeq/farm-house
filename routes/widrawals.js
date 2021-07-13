@@ -7,6 +7,10 @@ router.get('/:id',
   passport.authenticate('jwt',{session:false}),
   controller.getAWidthrawal
 );
+router.get('/all',
+  passport.authenticate('jwt',{session:false}),
+  controller.getAFarmerWidthrawal
+);
 
 router.get('/farmer/:id',
   passport.authenticate('jwt',{session:false}),

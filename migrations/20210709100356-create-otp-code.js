@@ -28,6 +28,16 @@ module.exports = {
           as:'farmerId'
         }
       },
+      superAdminId: {
+        type: Sequelize.UUID,
+        allowNull:true,
+        onDelete:'CASCADE',
+        references:{
+          model:'superAdmins',
+          key:'id',
+          as:'superAdminId'
+        }
+      },
       code: {
         type: Sequelize.STRING
       },

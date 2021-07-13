@@ -3,6 +3,11 @@ var router = express.Router();
 const passport = require('passport');
 const controller = require('../controllers/user.controller');
 
+router.get('/all', 
+  passport.authenticate('jwt',{session:false}),
+  controller.getAllSHFAccount
+); //Not In collection
+
 router.get('/', 
   passport.authenticate('jwt',{session:false}),
   controller.getSHFAccount
