@@ -500,7 +500,6 @@ const changeStatusToForSale = async (req,res)=>{
           }
         }
       );
-      console.log(".....",productExist.farmerId);
       const createInventory = await models.inventory.create(
         {
           id:uuid.v4(),
