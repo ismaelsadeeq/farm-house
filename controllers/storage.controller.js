@@ -2,7 +2,8 @@
 const models = require('../models');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
-const helpers = require('../utilities/helpers')
+const helpers = require('../utilities/helpers');
+const smsGlobal = require('../utilities/sms.api');
 require('dotenv').config();
 
 //response
@@ -33,6 +34,7 @@ const storeProduct = async (req,res)=>{
         productName:data.productName,
         numberOfProduct:data.numberOfProduct,
         unit:data.unit,
+        isForSale:false,
         dateStored:dateStored,
         dateStoredString:dateStoredString
       }
@@ -313,12 +315,233 @@ const widthraw = async (req,res)=>{
     return res.json("Unauthorize");
   }
 }
+const getProductNotForSale = async (req,res)=>{
+  const user = req.user;
+  const id = req.params.id;
+  const isAdmin = await models.admin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  const isSuperAdmin = await models.superAdmin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin || isSuperAdmin){
+    const currentPage = parseInt(req.query.currentPage);
+    const pageLimit = parseInt(req.query.pageLimit);
 
+    const skip = currentPage * pageLimit;
+    const store = await models.productStorage.findAll(
+      {
+        order:[['createdAt','DESC']],
+        offset:skip,
+        limit:pageLimit,
+        include:[
+          {model:models.farmer}
+        ],
+        where:{
+          isForsale:false
+        }
+      }
+      
+    );
+    if(!store) {
+      responseData.message = "something went wrong";
+      responseData.status = false;
+      responseData.data = null;
+      return res.json(responseData)  
+    }
+    responseData.message = "completed";
+    responseData.status = true;
+    responseData.data = store;
+    return res.json(responseData)
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Unauthorize");
+  }
+}
+const getProductForSale = async (req,res)=>{
+  const user = req.user;
+  const id = req.params.id;
+  const isAdmin = await models.admin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  const isSuperAdmin = await models.superAdmin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin || isSuperAdmin){
+    const currentPage = parseInt(req.query.currentPage);
+    const pageLimit = parseInt(req.query.pageLimit);
+
+    const skip = currentPage * pageLimit;
+    const store = await models.productStorage.findAll(
+      {
+        order:[['createdAt','DESC']],
+        offset:skip,
+        limit:pageLimit,
+        include:[
+          {model:models.farmer}
+        ],
+        where:{
+          isForsale:true
+        }
+      }
+      
+    );
+    if(!store) {
+      responseData.message = "something went wrong";
+      responseData.status = false;
+      responseData.data = null;
+      return res.json(responseData)  
+    }
+    responseData.message = "completed";
+    responseData.status = true;
+    responseData.data = store;
+    return res.json(responseData)
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Unauthorize");
+  }
+}
+const queryFarmer = async (req,res)=>{
+  const user = req.user;
+  const isAdmin = await models.admin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin){
+    const storageId = req.params.storageId;
+    const productExist = await models.storage.findOne(
+      {
+        where:{
+          id:farmerId
+        }
+      }
+    );
+    if(productExist){
+      const farmer = await models.farmer.findOne(
+        {
+          where:{
+            id:productExist.farmerId
+          }
+        }
+      );
+      const message = `Hello ${farmer.firstname} your ${productExist.numberOfProduct} ${productExist.unit} of ${productExist.productName}
+        is now ready to be sold in the market, come to the farmHouseHQ to change the status of your commodity to be 
+        available for buyers to purchase.
+        Thank you 
+      `
+      const farmerPhone = productExist.phoneNumber
+      await smsGlobal.sendMessage(process.env.FARMER_HQ_NUMBER,farmerPhone,message);
+      responseData.message = `Message sent`;
+      responseData.status = true;
+      responseData.data = null;
+      return res.json(responseData)
+    }
+    responseData.message = `Commodity with id ${storageId} does not exist`;
+    responseData.status = false;
+    responseData.data = null;
+    return res.json(responseData)
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Unauthorize");
+  }
+}
+
+const changeStatusToForSale = async (req,res)=>{
+  const user = req.user;
+  const isAdmin = await models.admin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin){
+    const data = req.body;
+    const storageId = req.params.storageId;
+    const productExist = await models.storage.findOne(
+      {
+        where:{
+          id:farmerId
+        }
+      }
+    );
+    if(productExist){
+      const farmer = await models.farmer.findOne(
+        {
+          where:{
+            id:productExist.farmerId
+          }
+        }
+      );
+      let commulativePrice = parseFloat(data.pricePerUnit) * parseFloat(productExist.numberOfProduct)
+      await models.storage.update(
+        {
+          isForSale:true
+        },{
+          where:{
+            id:storageId,
+            numberOfProduct:productExist.numberOfProduct,
+            productUnit:productExist.unit,
+            pricePerUnit:data.pricePerUnit
+          }
+        }
+      );
+      const createInventory = await models.inventory.create(
+        {
+          id:uuid.v4(),
+          farmerId:farmer.id,
+          cummulativeProductPrice:commulativePrice,
+          numberOfProduct:productExist.numberOfProduct,
+          productUnit:productExist.unit,
+          pricePerUnit:data.pricePerUnit
+        }
+      );
+      responseData.message = "inventory created";
+      responseData.status = true;
+      responseData.data = createInventory
+      return res.json(responseData);
+    }
+    responseData.message = `Commodity with id ${storageId} does not exist`;
+    responseData.status = false;
+    responseData.data = null;
+    return res.json(responseData)
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Unauthorize");
+  }
+}
 module.exports = {
   storeProduct,
   getAStorage,
   getFarmerStorage,
   getWarehouseStorage,
   getAllStorage,
-  widthraw 
+  widthraw,
+  getProductNotForSale,
+  getProductForSale,
+  queryFarmer,
+  changeStatusToForSale 
 }

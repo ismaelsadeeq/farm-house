@@ -15,6 +15,9 @@ module.exports = (sequelize, DataTypes) => {
     productStorage.hasMany(models.productWidthrawal,{
       foreignKey:'productStorageId'
     });
+    productStorage.hasOne(models.inventory,{
+      foreignKey:'productStorageId'
+    })
   }
   productStorage.init({
     productName: DataTypes.STRING,

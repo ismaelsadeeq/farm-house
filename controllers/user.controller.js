@@ -5,7 +5,7 @@ const models = require('../models')
 const multer = require('multer');
 const jwt = require('jsonwebtoken');
 const multerConfig = require('../config/multer');
-const smsGlobal = require('../utilities/sms.api')
+const smsGlobal = require('../utilities/sms.api');
 require('dotenv').config();
 const responseData = {
 	status: true,
