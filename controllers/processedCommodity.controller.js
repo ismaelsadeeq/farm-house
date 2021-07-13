@@ -98,6 +98,59 @@ const getCommodity = async (req,res)=>{
 }
 
 
+const getAllCommodity = async (req,res)=>{
+  const user = req.user;
+  const isAdmin = await models.admin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  const isSuperAdmin = await models.superAdmin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin || isSuperAdmin){
+    const id = req.params.centerId;
+    const currentPage = parseInt(req.query.currentPage);
+    const pageLimit = parseInt(req.query.pageLimit);
+
+    const skip = currentPage * pageLimit;
+    const commodity = await models.processedCommodity.findAll(
+      {
+        order:[['createdAt','DESC']],
+        offset:skip,
+        limit:pageLimit,
+        where:{
+          processingCenterId:id
+        },
+        include:[
+          {model:models.farmer}
+        ],
+      }
+    );
+    if(commodity){
+      responseData.message = "completed";
+      responseData.status = true;
+      responseData.data = commodity;
+      return res.json(responseData);
+    }
+    responseData.message = "something went wrong";
+    responseData.status = false;
+    responseData.data = null;
+    return res.json(responseData) 
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Unauthorize");
+  }
+}
+
+
 const updateProcessStatus = async (req,res)=>{
   const user = req.user;
   const isAdmin = await models.admin.findOne(
@@ -151,7 +204,7 @@ const deleteProduct = async (req,res)=>{
   );
   if(isAdmin){
     const id = req.params.id;
-    const commodity = await models.processedCommodity.delete(
+    const commodity = await models.processedCommodity.destroy(
      
       {
         where:{
@@ -250,6 +303,7 @@ module.exports = {
   updateProcessStatus,
   deleteProduct,
   storeProduct,
-  getCommodity
+  getCommodity,
+  getAllCommodity
 }
 

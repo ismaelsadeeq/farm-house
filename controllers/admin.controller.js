@@ -60,7 +60,7 @@ const createAdmin = async (req,res) =>{
   //generate otp and send email
   let val = helpers.generateOTP();
   let names = data.firstname;
-  const msg = "Welcome "+data.firstName+", use the code "+ val+" to verify your email and create your FarmHouse HQ Password";
+  const msg = "Welcome "+names+", use the code "+ val+" to verify your email and create your FarmHouse HQ Password";
   const htmlPart = `<div>
   <h3> Hello ${names}</h3
   <p>${msg}</p>
@@ -79,7 +79,7 @@ const createAdmin = async (req,res) =>{
   await models.otpCode.create({id:uuid.v4(),code:val,adminId:admin.id});
   // sendEmail(data)
   responseData.status = true
-  responseData.message = "Account use the code sent the email provided to verify and set ppassword";
+  responseData.message = "Account created use the code sent the email provided to verify and set ppassword";
   return res.json(responseData);
 
 }
@@ -220,8 +220,8 @@ const verifyEmail = async (req,res)=>{
         where:{code:data.code}
       }
     );
-    let names = userr.firstName
-    const msg = "Hello "+userr.firstName+", your FarmHouseHQ Account is successfully Verified";
+    let names = userr.firstname
+    const msg = "Hello "+names+", your FarmHouseHQ Account is successfully Verified";
     const htmlPart = `<div>
         <h3> Hello ${names}</h3
         <p>${msg}</p>
@@ -258,9 +258,9 @@ const sendCode = async (req,res)=>{
   )
   if (admin){
     let val = helpers.generateOTP();
-    const summary = "Hello "+admin.firstName+", use the code "+ val+" to reset your password to FarmHQ Account";
-    const msg = "Hello "+admin.firstName+", we heard you could not login to your  Account. This things happen to even the most careful of us, you should not feel so bad.  In the meantime, use the code "+ val+" to reset your password for your FarmHouseHQ Account. You should be back into your account in no time. <br/> <br /> <br /> <br /> <small>If you did not request this, you do not have to do anything  </small>";
-    let names = admin.firstName +" "+ admin.lastName
+    const summary = "Hello "+admin.firstname+", use the code "+ val+" to reset your password to FarmHQ Account";
+    const msg = "Hello "+admin.firstname+", we heard you could not login to your  Account. This things happen to even the most careful of us, you should not feel so bad.  In the meantime, use the code "+ val+" to reset your password for your FarmHouseHQ Account. You should be back into your account in no time. <br/> <br /> <br /> <br /> <small>If you did not request this, you do not have to do anything  </small>";
+    let names = admin.firstname +" "+ admin.lastname
     const htmlPart = `<div>
     <h3> Hello ${names}</h3
     <p>${summary}</p>

@@ -399,6 +399,7 @@ const createPin = async (req,res) =>{
         }
       }
     );
+    responseData.status = true;
     responseData.message = 'Pin set go to login';
     responseData.status = false;
     return res.json(responseData)

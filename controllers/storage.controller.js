@@ -430,10 +430,10 @@ const queryFarmer = async (req,res)=>{
   );
   if(isAdmin){
     const storageId = req.params.storageId;
-    const productExist = await models.storage.findOne(
+    const productExist = await models.productStorage.findOne(
       {
         where:{
-          id:farmerId
+          id:storageId
         }
       }
     );
@@ -480,38 +480,33 @@ const changeStatusToForSale = async (req,res)=>{
   if(isAdmin){
     const data = req.body;
     const storageId = req.params.storageId;
-    const productExist = await models.storage.findOne(
+    const productExist = await models.productStorage.findOne(
       {
         where:{
-          id:farmerId
+          id:storageId
         }
       }
     );
     if(productExist){
-      const farmer = await models.farmer.findOne(
-        {
-          where:{
-            id:productExist.farmerId
-          }
-        }
-      );
+      console.log(productExist.farmerId)
+     
       let commulativePrice = parseFloat(data.pricePerUnit) * parseFloat(productExist.numberOfProduct)
-      await models.storage.update(
+      await models.productStorage.update(
         {
           isForSale:true
         },{
           where:{
-            id:storageId,
-            numberOfProduct:productExist.numberOfProduct,
-            productUnit:productExist.unit,
-            pricePerUnit:data.pricePerUnit
+            id:storageId
           }
         }
       );
+      console.log(".....",productExist.farmerId);
       const createInventory = await models.inventory.create(
         {
           id:uuid.v4(),
-          farmerId:farmer.id,
+          farmerId:productExist.farmerId,
+          productName:productExist.productName,
+          productStorageId:storageId,
           cummulativeProductPrice:commulativePrice,
           numberOfProduct:productExist.numberOfProduct,
           productUnit:productExist.unit,

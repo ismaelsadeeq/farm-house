@@ -21,6 +21,9 @@ module.exports = (sequelize, DataTypes) => {
     farmer.hasMany(models.processedCommodity,{
       foreignKey:'farmerId'
     });
+    farmer.hasMany(models.inventory,{
+      foreignKey:'farmerId'
+    });
   }
   farmer.init({
     firstname: DataTypes.STRING,

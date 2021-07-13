@@ -34,7 +34,7 @@ router.post('/',
   controller.createAdmin
 );
 
-router.put('/', 
+router.put('/edit', 
   passport.authenticate('jwt',{session:false}),
   controller.editAdmin
 );

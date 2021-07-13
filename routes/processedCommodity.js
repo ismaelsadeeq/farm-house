@@ -13,7 +13,7 @@ router.put('/update-status/:id',
   controller.updateProcessStatus
 );
 
-router.delete('/update-product',
+router.delete('/widthraw-product/:id',
   passport.authenticate('jwt',{session:false}),
   controller.deleteProduct
 );
@@ -21,6 +21,11 @@ router.delete('/update-product',
 router.post('/store/commodity-processed/:id/warehouseId/:warehouseId',
   passport.authenticate('jwt',{session:false}),
   controller.storeProduct
+);
+
+router.get('/commodity/centerId/:centerId',
+  passport.authenticate('jwt',{session:false}),
+  controller.getAllCommodity
 );
 
 router.get('/commodity/:id',

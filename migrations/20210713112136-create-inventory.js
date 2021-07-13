@@ -10,7 +10,7 @@ module.exports = {
       },
       productStorageId: {
         type: Sequelize.UUID,
-        allowNull:false,
+        allowNull:true,
         onDelete:'CASCADE',
         references:{
           model:'productStorages',
@@ -20,7 +20,7 @@ module.exports = {
       },
       farmerId: {
         type: Sequelize.UUID,
-        allowNull:false,
+        allowNull:true,
         onDelete:'CASCADE',
         references:{
           model:'farmers',
