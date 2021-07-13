@@ -28,21 +28,22 @@ router.get('/warehouse/:id',
   passport.authenticate('jwt',{session:false}),
   controller.getWarehouseStorage
 );
-//Not tested
-router.get('/products-not-for-sale',
-  passport.authenticate('jwt',{session:true}),
-  controller.getProductNotForSale
-)
-router.get('/products-for-sale',
+router.get('/products-for-sale/warehouseId/:id',
   passport.authenticate('jwt',{session:true}),
   controller.getProductForSale
 )
+
+router.get('/products-not-for-sale/warehouseId/:id',
+  passport.authenticate('jwt',{session:true}),
+  controller.getProductNotForSale
+)
+
 router.post('/query-farmer/storageId/:storageId',
   passport.authenticate('jwt',{session:false}),
   controller.queryFarmer
 );
 
-router.post('/for-sale/storage/:storageId',
+router.post('/for-sale-storage/:storageId',
   passport.authenticate('jwt',{session:false}),
   controller.changeStatusToForSale
 )

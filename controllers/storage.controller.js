@@ -317,7 +317,6 @@ const widthraw = async (req,res)=>{
 }
 const getProductNotForSale = async (req,res)=>{
   const user = req.user;
-  const id = req.params.id;
   const isAdmin = await models.admin.findOne(
     {
       where:{
@@ -337,6 +336,7 @@ const getProductNotForSale = async (req,res)=>{
     const pageLimit = parseInt(req.query.pageLimit);
 
     const skip = currentPage * pageLimit;
+    const warehouseId = req.params.id;
     const store = await models.productStorage.findAll(
       {
         order:[['createdAt','DESC']],
@@ -346,7 +346,8 @@ const getProductNotForSale = async (req,res)=>{
           {model:models.farmer}
         ],
         where:{
-          isForsale:false
+          isForsale:false,
+          warehouseId:warehouseId
         }
       }
       
@@ -364,12 +365,11 @@ const getProductNotForSale = async (req,res)=>{
   } else{
     responseData.status = false;
     res.statusCode = 401
-    return res.json("Unauthorize");
+    return res.json(req.user);
   }
 }
 const getProductForSale = async (req,res)=>{
   const user = req.user;
-  const id = req.params.id;
   const isAdmin = await models.admin.findOne(
     {
       where:{
@@ -389,6 +389,7 @@ const getProductForSale = async (req,res)=>{
     const pageLimit = parseInt(req.query.pageLimit);
 
     const skip = currentPage * pageLimit;
+    const warehouseId = req.params.id;
     const store = await models.productStorage.findAll(
       {
         order:[['createdAt','DESC']],
@@ -398,7 +399,8 @@ const getProductForSale = async (req,res)=>{
           {model:models.farmer}
         ],
         where:{
-          isForsale:true
+          isForsale:true,
+          warehouseId:warehouseId
         }
       }
       

@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 const helpers = require('../utilities/helpers');
 const smsGlobal = require('../utilities/sms.api');
+const { Op } = require("sequelize");
+
 require('dotenv').config();
 
 //response
@@ -18,6 +20,7 @@ const getAllInventories =  async (req,res)=>{
   const pageLimit = parseInt(req.query.pageLimit);
 
   const skip = currentPage * pageLimit;
+  const count = await models.inventory.count();
   const data = await models.inventory.findAll(
     {
       order:[['createdAt','DESC']],
@@ -29,6 +32,7 @@ const getAllInventories =  async (req,res)=>{
     responseData.message = "completed";
     responseData.status = true;
     responseData.data = data;
+    responseData.totalNumberOfProducts = count
     return res.json(responseData)
   }
   responseData.message = "Opps there are no commodities for sale at the moment";

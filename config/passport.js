@@ -51,10 +51,10 @@ module.exports = passport =>{
         {
           where:{id:jwt_payload.id}
         }
-      )
+      );
       if(admin){
         const user = admin
-        return done(null,user);
+        return done(null, user);
       }else if(superAdmin){
         const user = superAdmin
         return done(null,user);
@@ -65,4 +65,11 @@ module.exports = passport =>{
       return done(null,false);
     }
   ));
+  passport.serializeUser(function(user, done) {
+    done(null, user);
+  });
+  
+  passport.deserializeUser(function(user, done) {
+    done(null, user);
+  });
 }
