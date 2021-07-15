@@ -20,6 +20,9 @@ module.exports = {
       address: {
         type: Sequelize.STRING
       },
+      community :{
+        type: Sequelize.STRING
+      },
       description: {
         type: Sequelize.STRING
       },

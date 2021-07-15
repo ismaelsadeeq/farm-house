@@ -51,17 +51,14 @@ const createSHFAccount = async (req,res) =>{
         const createFarmer = await models.farmer.create(
           {
             id:uuid.v4(),
-            photoId:req.file.path,
+            photoId:req.file.path[0],
             //Biometrics
             firstname :data.firstname,
             lastname:data.lastname,
             address:data.address,
             state:data.state,
-            bvnNumber:data.bvnNumber,
-            accountNumber:data.accountNumber,
-            hasPin :false,
-            bank:data.bank,
-            phoneNumber:data.phoneNumber
+            phoneNumber:data.phoneNumber,
+            signature:req.file.path[1]
           }
         )
         if(createFarmer){
@@ -99,7 +96,7 @@ const updateSHFAccount = async (req,res)=>{
     }
   );
   if(isAdmin || isUser){
-    multerConfig.singleUpload(req, res, async function(err) {
+    multerConfig.multipleUpload(req, res, async function(err) {
 			if (err instanceof multer.MulterError) {
         responseData.status = false,
         res.statusCode = 200;
@@ -116,16 +113,14 @@ const updateSHFAccount = async (req,res)=>{
         if(isUser){
           const createFarmer = await models.farmer.update(
             {
-              photoId:req.file.path,
+              photoId:req.file.path[0],
               //Biometrics
               firstname :data.firstname,
               lastname:data.lastname,
               address:data.address,
               state:data.state,
-              bank:data.bank,
-              bvnNumber:data.bvnNumber,
-              accountNumber:data.accountNumber,
-              phoneNumber:data.phoneNumber
+              phoneNumber:data.phoneNumber,
+              signature:req.file.path[1]
             },
             {
               where:{
@@ -137,16 +132,14 @@ const updateSHFAccount = async (req,res)=>{
         {
           const createFarmer = await models.farmer.update(
             {
-              photoId:req.file.path,
+              photoId:req.file.path[0],
               //Biometrics
               firstname :data.firstname,
               lastname:data.lastname,
               address:data.address,
               state:data.state,
-              bank:data.bank,
-              bvnNumber:data.bvnNumber,
-              accountNumber:data.accountNumber,
-              phoneNumber:data.phoneNumber
+              phoneNumber:data.phoneNumber,
+              signature:req.file.path[1]
             },
             {
               where:{
@@ -315,17 +308,10 @@ const farmerLogin =async (req,res) => {
   if(farmer){
     const hasPin = farmer.hasPin;
     if(!hasPin){
-      const code = helpers.generateOTP();
+      const code = `Hello ${farmer.firstname}you need to answer the question ${farmer.secretQuestion} to set your pin`
       const phoneNumber = farmer.phoneNumber;
       await smsGlobal.sendMessage(process.env.FARMER_HQ_NUMBER,phoneNumber,code);
-      await models.otpCode.create(
-        {
-          id:uuid.v4(),
-          code:code,
-          farmerId:farmer.id
-        }
-      );
-      responseData.message = `A code was sent to ${phoneNumber}`;
+      responseData.message = `A message was sent to ${phoneNumber}`;
       responseData.status = false ;
       return res.json(responseData);
     }
@@ -364,15 +350,15 @@ const farmerLogin =async (req,res) => {
 
 const createPin = async (req,res) =>{
   const data = req.body;
-  const code = data.code;
-  const isCode = await models.otpCode.findOne(
+  const answer = data.answer;
+  const farmer = await models.farmer.findOne(
     {
       where:{
-        code:code
+        secretAnswer:answer
       }
     }
   );
-  if(isCode){
+  if(farmer){
     if(!data.pin == data.confirmPin){
       responseData.message = 'pin and cornfirm pin doesn\'t match';
       responseData.status = false;
@@ -388,19 +374,12 @@ const createPin = async (req,res) =>{
       },
       {
         where:{
-          id:isCode.farmerId
-        }
-      }
-    );
-    const deleteCode = await models.otpCode.destroy(
-      {
-        where:{
-          code:data.code
+          id:farmer.id
         }
       }
     );
     responseData.status = true;
-    responseData.message = 'Pin set go to login';
+    responseData.message = 'Pin set';
     responseData.status = false;
     return res.json(responseData)
   }

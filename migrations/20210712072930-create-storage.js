@@ -28,6 +28,12 @@ module.exports = {
           as:'warehouseId'
         }
       },
+      storageAccountName: {
+        type: Sequelize.STRING
+      },
+      storageAccountNumber: {
+        type: Sequelize.STRING
+      },
       productName: {
         type: Sequelize.STRING
       },

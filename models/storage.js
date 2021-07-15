@@ -20,6 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     })
   }
   productStorage.init({
+    storageAccountName : DataTypes.STRING,
+    storageAccountNumber :DataTypes.STRING,
     productName: DataTypes.STRING,
     numberOfProduct: DataTypes.STRING,
     unit: DataTypes.STRING,

@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     state: DataTypes.STRING,
     localGovernment: DataTypes.STRING,
     description: DataTypes.STRING,
+    community: DataTypes.STRING,
     address:DataTypes.STRING,
     category: DataTypes.STRING,
     storageCapacity: DataTypes.STRING

@@ -26,10 +26,19 @@ const storeProduct = async (req,res)=>{
     const data = req.body;
     let dateStored = new Date();
     let dateStoredString = dateStored.toLocaleString();
+    const farmer = await models.farmer.findOne(
+      {
+        where:{
+          id:data.farmerId
+        }
+      }
+    )
     const productStore = await models.productStorage.create(
       {
         id:uuid.v4(),
         farmerId:data.farmerId,
+        storageAccountName:farmer.firstname,
+        storageAccountNumber:helpers.generateOTP(),
         warehouseId:data.warehouseId,
         productName:data.productName,
         numberOfProduct:data.numberOfProduct,
@@ -45,6 +54,7 @@ const storeProduct = async (req,res)=>{
       responseData.data = null;
       return res.json(responseData)  
     }
+    await smsGlobal.sendMessage(process.env.FARMER_HQ_NUMBER,phoneNumber,code);
     responseData.message = "storage created";
     responseData.status = true;
     responseData.data = productStore;
