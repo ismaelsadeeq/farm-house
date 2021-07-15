@@ -1,16 +1,16 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('productStorages', {
+    await queryInterface.createTable('loans', {
       id: {
         allowNull: false,
         primaryKey: true,
         unique:true,
         type: Sequelize.UUID
-      }, 
+      },
       farmerId: {
         type: Sequelize.UUID,
-        allowNull:false,
+        allowNull:true,
         onDelete:'CASCADE',
         references:{
           model:'farmers',
@@ -18,36 +18,27 @@ module.exports = {
           as:'farmerId'
         }
       },
-      warehouseId: {
+      loanCategoryId: {
         type: Sequelize.UUID,
-        allowNull:false,
+        allowNull:true,
         onDelete:'CASCADE',
         references:{
-          model:'warehouses',
+          model:'loanCategories',
           key:'id',
-          as:'warehouseId'
+          as:'loanCategoryId'
         }
       },
-      productName: {
+      reasonForApplication: {
         type: Sequelize.STRING
       },
-      numberOfProduct: {
-        type: Sequelize.STRING
+      isApproved: {
+        type: Sequelize.BOOLEAN
       },
-      unit: {
-        type: Sequelize.STRING
+      isGiven: {
+        type: Sequelize.BOOLEAN
       },
-      isForSale : {
-        type : Sequelize.STRING
-      },
-      peggedPrice :{
-        type : Sequelize.STRING,
-      },
-      dateStored : {
-        type: Sequelize.DATE
-      },
-      dateStoredString :{
-        type: Sequelize.STRING
+      isPaid: {
+        type: Sequelize.BOOLEAN
       },
       createdAt: {
         allowNull: false,
@@ -63,6 +54,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('productStorages');
+    await queryInterface.dropTable('loans');
   }
 };

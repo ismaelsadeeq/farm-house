@@ -149,6 +149,47 @@ const getFarmerStorage = async (req,res)=>{
     return res.json("Unauthorize");
   }
 }
+const getFarmerStorageUssd = async (req,res)=>{
+  const phoneNumber = req.params.phoneNumber;
+  const isFarmer = await models.farmer.findOne(
+    {
+      where:{
+        phoneNumber:phoneNumber
+      }
+    }
+  );
+  if(isFarmer){
+    const currentPage = parseInt(req.query.currentPage);
+    const pageLimit = parseInt(req.query.pageLimit);
+
+    const skip = currentPage * pageLimit;
+    const store = await models.productStorage.findAll(
+      {
+        order:[['createdAt','DESC']],
+        offset:skip,
+        limit:pageLimit,
+        where:{
+          farmerId:isFarmer.id
+        },
+        attributes:['id','productName','numberOfProduct','unit']
+      }
+    );
+    if(!store) {
+      responseData.message = "something went wrong";
+      responseData.status = false;
+      responseData.data = null;
+      return res.json(responseData)  
+    }
+    responseData.message = "completed";
+    responseData.status = true;
+    responseData.data = store;
+    return res.json(responseData)
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("There is no farmer with this phone number");
+  }
+}
 
 const getWarehouseStorage = async (req,res)=>{
   const user = req.user;
@@ -432,6 +473,7 @@ const queryFarmer = async (req,res)=>{
   );
   if(isAdmin){
     const storageId = req.params.storageId;
+    const data = req.body;
     const productExist = await models.productStorage.findOne(
       {
         where:{
@@ -447,9 +489,18 @@ const queryFarmer = async (req,res)=>{
           }
         }
       );
+      await models.productStorage.update(
+        {
+          peggedPrice:data.price
+        },
+        {
+          where:{
+            id:storageId
+          }
+        }
+      );
       const message = `Hello ${farmer.firstname} your ${productExist.numberOfProduct} ${productExist.unit} of ${productExist.productName}
-        is now ready to be sold in the market, come to the farmHouseHQ to change the status of your commodity to be 
-        available for buyers to purchase.
+        is now ready to be sold in the market at ${data.price} per ${productExist.unit}, ${process.env.FARMER_MESSAGE}
         Thank you 
       `
       const farmerPhone = productExist.phoneNumber
@@ -471,15 +522,15 @@ const queryFarmer = async (req,res)=>{
 }
 
 const changeStatusToForSale = async (req,res)=>{
-  const user = req.user;
-  const isAdmin = await models.admin.findOne(
+  const data = req.body;
+  const isUser = await models.farmer.findOne(
     {
       where:{
-        id:user.id
+        phoneNumber:data.phoneNumber
       }
     }
   );
-  if(isAdmin){
+  if(isUser){
     const data = req.body;
     const storageId = req.params.storageId;
     const productExist = await models.productStorage.findOne(
@@ -490,8 +541,6 @@ const changeStatusToForSale = async (req,res)=>{
       }
     );
     if(productExist){
-      console.log(productExist.farmerId)
-     
       let commulativePrice = parseFloat(data.pricePerUnit) * parseFloat(productExist.numberOfProduct)
       await models.productStorage.update(
         {
@@ -511,12 +560,12 @@ const changeStatusToForSale = async (req,res)=>{
           cummulativeProductPrice:commulativePrice,
           numberOfProduct:productExist.numberOfProduct,
           productUnit:productExist.unit,
-          pricePerUnit:data.pricePerUnit
+          pricePerUnit:productExist.peggedPrice
         }
       );
-      responseData.message = "inventory created";
+      responseData.message = "Status changed to for sale";
       responseData.status = true;
-      responseData.data = createInventory
+      responseData.data = null
       return res.json(responseData);
     }
     responseData.message = `Commodity with id ${storageId} does not exist`;
@@ -529,6 +578,49 @@ const changeStatusToForSale = async (req,res)=>{
     return res.json("Unauthorize");
   }
 }
+const changeStatusToNotForSale = async (req,res)=>{
+  const data = req.body;
+  const isUser = await models.farmer.findOne(
+    {
+      where:{
+        phoneNumber:data.phoneNumber
+      }
+    }
+  );
+  if(isUser){
+    const storageId = req.params.storageId;
+    const productExist = await models.productStorage.findOne(
+      {
+        where:{
+          id:storageId
+        }
+      }
+    );
+    if(productExist){
+      await models.productStorage.update(
+        {
+          isForSale:false
+        },{
+          where:{
+            id:storageId
+          }
+        }
+      );
+      responseData.message = "Status Changed to not for sale";
+      responseData.status = true;
+      responseData.data = createInventory
+      return res.json(responseData);
+    }
+    responseData.message = `Commodity with id ${storageId} does not exist`;
+    responseData.status = false;
+    responseData.data = null;
+    return res.json(responseData);
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Incorrect Phone number");
+  }
+}
 module.exports = {
   storeProduct,
   getAStorage,
@@ -539,5 +631,7 @@ module.exports = {
   getProductNotForSale,
   getProductForSale,
   queryFarmer,
-  changeStatusToForSale 
+  changeStatusToForSale,
+  changeStatusToNotForSale,
+  getFarmerStorageUssd 
 }

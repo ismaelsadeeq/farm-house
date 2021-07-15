@@ -24,6 +24,10 @@ router.get('/farmer/:id',
   passport.authenticate('jwt',{session:false}),
   controller.getFarmerStorage
 );
+//Not Tested
+router.get('/farmer/:phoneNumber',
+  controller.getFarmerStorageUssd
+);
 router.get('/warehouse/:id',
   passport.authenticate('jwt',{session:false}),
   controller.getWarehouseStorage
@@ -43,9 +47,12 @@ router.post('/query-farmer/storageId/:storageId',
   controller.queryFarmer
 );
 
+//Not Tested
 router.post('/for-sale-storage/:storageId',
-  passport.authenticate('jwt',{session:false}),
   controller.changeStatusToForSale
+)
+router.post('/not-sale-storage/:storageId',
+  controller.changeStatusToNotForSale
 )
 
 module.exports = router;
