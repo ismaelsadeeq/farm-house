@@ -35,7 +35,7 @@ const getApproveNotGivenLoans = async (req,res)=>{
         limit:pageLimit,
         where:{
           isApproved:true,
-          isGiven:false
+          isGiven:false || null
         }
       }
     );
@@ -120,7 +120,7 @@ const getApproveNotPaidLoans = async (req,res)=>{
         where:{
           isApproved:true,
           isGiven:true,
-          isPaid:false
+          isPaid:null || false
         }
       }
     );
@@ -185,42 +185,31 @@ const getApprovePaidLoans = async (req,res)=>{
   }
 }
 const unApprovedLoans = async (req,res)=>{
-  const user = req.user;
-  const isAdmin = await models.admin.findOne(
+  const currentPage = parseInt(req.query.currentPage);
+  const pageLimit = parseInt(req.query.pageLimit);
+
+  const skip = currentPage * pageLimit;
+  const loans = await models.loan.findAll(
     {
+      order:[['createdAt','DESC']],
+      offset:skip,
+      limit:pageLimit,
       where:{
-        id:user.id
+        isApproved:false || null,
       }
     }
   );
-  if(isAdmin){
-    const currentPage = parseInt(req.query.currentPage);
-    const pageLimit = parseInt(req.query.pageLimit);
-
-    const skip = currentPage * pageLimit;
-    const loans = await models.loan.findAll(
-      {
-        order:[['createdAt','DESC']],
-        offset:skip,
-        limit:pageLimit
-      }
-    );
-    if(!loans){
-      responseData.message = `Something went wrong`;
-      responseData.status = false;
-      responseData.data = null;
-      return res.json(responseData)  
-    }
-    responseData.message = "completed";
-    responseData.status = true;
-    responseData.data = loans;
-    return res.json(responseData)
-  
-  } else{
+  if(!loans){
+    responseData.message = `Something went wrong`;
     responseData.status = false;
-    res.statusCode = 401
-    return res.json("Unauthorize");
+    responseData.data = null;
+    return res.json(responseData)  
   }
+  responseData.message = "completed";
+  responseData.status = true;
+  responseData.data = loans;
+  return res.json(responseData)
+  
 }
 const getLoan = async (req,res)=>{
   const user = req.user;
@@ -235,7 +224,7 @@ const getLoan = async (req,res)=>{
     const loan = await models.loan.findOne(
       {
         where:{
-          id:req.params.id
+          id:req.params.loanId
         }
       }
     );
@@ -267,6 +256,19 @@ const applyLoan = async (req,res)=>{
   );
   if(isAdmin){
     const data = req.body;
+    const applied = await models.loan.findOne(
+      {
+        where:{
+          farmerId:req.params.id
+        }
+      }
+    );
+    if(applied.loanCategoryId == req.params.categoryId){
+      responseData.message = `Loan already applied`;
+      responseData.status = false;
+      responseData.data = null;
+      return res.json(responseData); 
+    }
     const loan = await models.loan.create(
       {
         id:uuid.v4(),
@@ -308,11 +310,25 @@ const applyLoanUssd = async (req,res)=>{
     responseData.data = null;
     return res.json(responseData); 
   }
+  const applied = await models.loan.findOne(
+    {
+      where:{
+        farmerId:farmer.id
+      }
+    }
+  );
+  
+  if(applied && applied.loanCategoryId == req.params.loanCategoryId){
+    responseData.message = `Loan already applied`;
+    responseData.status = false;
+    responseData.data = null;
+    return res.json(responseData); 
+  }
   const apply = await models.loan.create(
     {
       id:uuid.v4(),
       farmerId:farmer.id,
-      loanCategoryId:req.params.id,
+      loanCategoryId:req.params.loanCategoryId,
       reasonForApplication:data.reasonForApplication
     }
   );
@@ -340,8 +356,10 @@ const approveLoan = async (req,res)=>{
     const loan = await models.loan.update(
       {
         isApproved:true,
+      },
+      {
         where:{
-          id:req.params.id
+          id:req.params.loanId
         }
       }
     );
@@ -375,8 +393,11 @@ const declineLoan = async (req,res)=>{
     const loan = await models.loan.update(
       {
         isApproved:false,
+      
+      },
+      {
         where:{
-          id:req.params.id
+          id:req.params.loanId
         }
       }
     );
@@ -386,7 +407,7 @@ const declineLoan = async (req,res)=>{
       responseData.data = null;
       return res.json(responseData)  
     }
-    responseData.message = "Loan Approved";
+    responseData.message = "Loan declined";
     responseData.status = true;
     responseData.data = null;
     return res.json(responseData)
@@ -410,8 +431,10 @@ const issueLoan = async (req,res)=>{
     const loan = await models.loan.update(
       {
         isGiven:true,
+      },
+      {
         where:{
-          id:req.params.id
+          id:req.params.loanId
         }
       }
     );
@@ -445,8 +468,10 @@ const payLoan = async (req,res)=>{
     const loan = await models.loan.update(
       {
         isPaid:true,
+      },
+      {
         where:{
-          id:req.params.id
+          id:req.params.loanId
         }
       }
     );

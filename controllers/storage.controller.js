@@ -541,7 +541,8 @@ const changeStatusToForSale = async (req,res)=>{
       }
     );
     if(productExist){
-      let commulativePrice = parseFloat(data.pricePerUnit) * parseFloat(productExist.numberOfProduct)
+      let commulativePrice = parseFloat(productExist.peggedPrice) * parseFloat(productExist.numberOfProduct)
+      console.log(data.pricePerUnit);
       await models.productStorage.update(
         {
           isForSale:true
@@ -568,7 +569,7 @@ const changeStatusToForSale = async (req,res)=>{
       responseData.data = null
       return res.json(responseData);
     }
-    responseData.message = `Commodity with id ${storageId} does not exist`;
+    responseData.message = `Commodity with storage id ${storageId} does not exist`;
     responseData.status = false;
     responseData.data = null;
     return res.json(responseData)
@@ -608,7 +609,7 @@ const changeStatusToNotForSale = async (req,res)=>{
       );
       responseData.message = "Status Changed to not for sale";
       responseData.status = true;
-      responseData.data = createInventory
+      responseData.data = null
       return res.json(responseData);
     }
     responseData.message = `Commodity with id ${storageId} does not exist`;

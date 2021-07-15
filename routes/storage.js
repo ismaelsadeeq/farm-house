@@ -20,11 +20,10 @@ router.get('/:id',
   passport.authenticate('jwt',{session:false}),
   controller.getAStorage
 );
-router.get('/farmer/:id',
+router.get('/farmer-admin/:id',
   passport.authenticate('jwt',{session:false}),
   controller.getFarmerStorage
 );
-//Not Tested
 router.get('/farmer/:phoneNumber',
   controller.getFarmerStorageUssd
 );
@@ -47,11 +46,10 @@ router.post('/query-farmer/storageId/:storageId',
   controller.queryFarmer
 );
 
-//Not Tested
 router.post('/for-sale-storage/:storageId',
   controller.changeStatusToForSale
 )
-router.post('/not-sale-storage/:storageId',
+router.post('/not-for-sale-storage/:storageId',
   controller.changeStatusToNotForSale
 )
 

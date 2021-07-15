@@ -7,7 +7,7 @@ router.get('/approve/not-issued',
   passport.authenticate('jwt',{session:false}),
   controller.getApproveNotGivenLoans
 );
-router.get('/approve/issued',
+router.get('/issued',
   passport.authenticate('jwt',{session:false}),
   controller.getApproveGivenLoans
 );
@@ -22,12 +22,11 @@ router.get('/approve/paid',
 router.get('/applied',
   controller.unApprovedLoans
 );
-router.get('/:id',
+router.get('/:loanId',
   passport.authenticate('jwt',{session:false}),
   controller.getLoan
 );
-//ussd
-router.post('/apply/:id',
+router.post('/apply/:loanCategoryId',
   controller.applyLoanUssd
 );
 
@@ -35,19 +34,19 @@ router.post('/apply-loan/farmerId/:id/categoryId/:categoryId',
   passport.authenticate('jwt',{session:false}),
   controller.applyLoan
 );
-router.post('/approve',
+router.post('/approve/:loanId',
   passport.authenticate('jwt',{session:false}),
   controller.approveLoan
 );
-router.post('/decline',
+router.post('/decline/:loanId',
   passport.authenticate('jwt',{session:false}),
   controller.declineLoan
 );
-router.post('/issue',
+router.post('/issue/:loanId',
   passport.authenticate('jwt',{session:false}),
   controller.issueLoan
 );
-router.post('/paid',
+router.post('/paid/:loanId',
   passport.authenticate('jwt',{session:false}),
   controller.payLoan
 );

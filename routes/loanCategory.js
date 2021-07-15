@@ -15,13 +15,12 @@ router.delete('/:id',
   passport.authenticate('jwt',{session:false}),
   controller.deleteLoanCategory
 );
+router.get('/all',
+  controller.getLoanCategories
+);
 router.get('/:id',
   passport.authenticate('jwt',{session:false}),
   controller.getLoanCategory
 );
-router.get('/all',
-  controller.getLoanCategories
-);
-
 
 module.exports = router;
