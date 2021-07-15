@@ -19,8 +19,7 @@ router.get('/approve/paid',
   passport.authenticate('jwt',{session:false}),
   controller.getApprovePaidLoans
 );
-router.get('/un-approve',
-  passport.authenticate('jwt',{session:false}),
+router.get('/applied',
   controller.unApprovedLoans
 );
 router.get('/:id',

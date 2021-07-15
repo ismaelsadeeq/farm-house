@@ -202,10 +202,7 @@ const unApprovedLoans = async (req,res)=>{
       {
         order:[['createdAt','DESC']],
         offset:skip,
-        limit:pageLimit,
-        where:{
-          isApproved:false,
-        }
+        limit:pageLimit
       }
     );
     if(!loans){
