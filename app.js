@@ -34,6 +34,8 @@ var processingCenterRouter = require('./routes/processingCenter');
 var widthrawalsRouter = require('./routes/widrawals')
 var processedCommodityRouter = require('./routes/processedCommodity');
 var inventoryRouter = require('./routes/inventory');
+var loanRouter = require('./routes/loan');
+var loanCategoryRouter = require('./routes/loanCategory');
 
 
 app.use('/api/v1', indexRouter);
@@ -46,6 +48,8 @@ app.use('/api/v1/mini-processing-center', processingCenterRouter);
 app.use('/api/v1/product-widthrawal', widthrawalsRouter);
 app.use('/api/v1/process', processedCommodityRouter);
 app.use('/api/v1/inventory', inventoryRouter);
+app.use('/api/v1/loan', loanRouter);
+app.use('/api/v1/loan-category', loanCategoryRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
