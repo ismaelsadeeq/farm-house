@@ -54,7 +54,11 @@ const storeProduct = async (req,res)=>{
       responseData.data = null;
       return res.json(responseData)  
     }
-    await smsGlobal.sendMessage(process.env.FARMER_HQ_NUMBER,phoneNumber,code);
+    let message = `Hello ${farmer.firstname} you just made a storage of ${productStore.numberOfProduct} ${productStore.unit}
+     of ${productStore.productName} dated ${dateStoredString}
+     Thank you
+     `
+    await smsGlobal.sendMessage(process.env.FARMER_HQ_NUMBER,phoneNumber,message);
     responseData.message = "storage created";
     responseData.status = true;
     responseData.data = productStore;
