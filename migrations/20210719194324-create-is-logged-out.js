@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('otpCodes', {
+    await queryInterface.createTable('isLoggedOuts', {
       id: {
         allowNull: false,
         primaryKey: true,
@@ -48,8 +48,8 @@ module.exports = {
           as:'userId'
         }
       },
-      code: {
-        type: Sequelize.STRING
+      status: {
+        type: Sequelize.BOOLEAN
       },
       createdAt: {
         allowNull: false,
@@ -65,6 +65,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('otpCodes');
+    await queryInterface.dropTable('isLoggedOuts');
   }
 };

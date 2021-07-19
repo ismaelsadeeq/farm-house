@@ -28,6 +28,11 @@ module.exports = passport =>{
          where:{superAdminId:jwt_payload.id,status:true}
         }
       )
+      const out4 =  await models.isLoggedOut.findOne(
+        {
+         where:{userId:jwt_payload.id,status:true}
+        }
+      )
       if(out){
         return done(null, false)
       }
@@ -36,7 +41,10 @@ module.exports = passport =>{
       }
       if(out3){
         return done(null, false)
-      }  
+      }
+      if(out4){
+        return done(null, false)
+      }   
       const admin = await models.admin.findOne(
         {
           where:{id:jwt_payload.id}
@@ -52,6 +60,11 @@ module.exports = passport =>{
           where:{id:jwt_payload.id}
         }
       );
+      const normalUser = await models.user.findOne(
+        {
+          where:{id:jwt_payload.id}
+        }
+      );
       if(admin){
         const user = admin
         return done(null, user);
@@ -60,6 +73,9 @@ module.exports = passport =>{
         return done(null,user);
       }else if(farmer){
         const user = farmer
+        return done(null,user);
+      }else if(normalUser){
+        const user = normalUser;
         return done(null,user);
       }
       return done(null,false);

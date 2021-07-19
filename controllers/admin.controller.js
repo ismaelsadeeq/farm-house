@@ -353,7 +353,7 @@ async function changePassword(req,res){
       where:{id:req.user.id}
     }
   );
-  const checkPassword =  bcrypt.compareSync(data.password, user.password);
+  const checkPassword =  bcrypt.compareSync(data.password, admin.password);
   if(checkPassword){
     if(data.newPassword === data.confirmPassword){
       const saltRounds = 10 

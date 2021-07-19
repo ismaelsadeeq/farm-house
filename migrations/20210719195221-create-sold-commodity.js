@@ -1,42 +1,12 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('otpCodes', {
+    await queryInterface.createTable('soldCommodities', {
       id: {
         allowNull: false,
         primaryKey: true,
         unique:true,
         type: Sequelize.UUID
-      },
-      adminId: {
-        type: Sequelize.UUID,
-        allowNull:true,
-        onDelete:'CASCADE',
-        references:{
-          model:'admins',
-          key:'id',
-          as:'adminId'
-        }
-      },
-      farmerId: {
-        type: Sequelize.UUID,
-        allowNull:true,
-        onDelete:'CASCADE',
-        references:{
-          model:'farmers',
-          key:'id',
-          as:'farmerId'
-        }
-      },
-      superAdminId: {
-        type: Sequelize.UUID,
-        allowNull:true,
-        onDelete:'CASCADE',
-        references:{
-          model:'superAdmins',
-          key:'id',
-          as:'superAdminId'
-        }
       },
       userId: {
         type: Sequelize.UUID,
@@ -48,8 +18,21 @@ module.exports = {
           as:'userId'
         }
       },
-      code: {
+      inventoryId: {
+        type: Sequelize.UUID,
+        allowNull:true,
+        onDelete:'CASCADE',
+        references:{
+          model:'inventories',
+          key:'id',
+          as:'inventoryId'
+        }
+      },
+      time: {
         type: Sequelize.STRING
+      },
+      isDeliverd: {
+        type: Sequelize.BOOLEAN
       },
       createdAt: {
         allowNull: false,
@@ -65,6 +48,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('otpCodes');
+    await queryInterface.dropTable('soldCommodities');
   }
 };

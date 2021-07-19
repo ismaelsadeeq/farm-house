@@ -14,7 +14,10 @@ module.exports = (sequelize, DataTypes) => {
     });
     otpCode.belongsTo(models.superAdmin, {
       foreignKey:'superAdminId'
-    })
+    });
+    otpCode.belongsTo(models.user, {
+      foreignKey:'userId'
+    });
   }
   otpCode.init({
     code: DataTypes.STRING

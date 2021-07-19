@@ -1,45 +1,37 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('isLoggedOuts', {
+    await queryInterface.createTable('transactions', {
       id: {
         allowNull: false,
         primaryKey: true,
         unique:true,
         type: Sequelize.UUID
       },
-      adminId: {
+      userId: {
         type: Sequelize.UUID,
         allowNull:true,
         onDelete:'CASCADE',
         references:{
-          model:'admins',
+          model:'users',
           key:'id',
-          as:'adminId'
+          as:'userId'
         }
       },
-      farmerId: {
-        type: Sequelize.UUID,
-        allowNull:true,
-        onDelete:'CASCADE',
-        references:{
-          model:'farmers',
-          key:'id',
-          as:'farmerId'
-        }
+      transactionType: {
+        type: Sequelize.STRING
       },
-      superAdminId: {
-        type: Sequelize.UUID,
-        allowNull:true,
-        onDelete:'CASCADE',
-        references:{
-          model:'superAdmins',
-          key:'id',
-          as:'superAdminId'
-        }
+      amount: {
+        type: Sequelize.STRING
+      },
+      reference: {
+        type: Sequelize.STRING
       },
       status: {
         type: Sequelize.BOOLEAN
+      },
+      time: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -55,6 +47,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('isLoggedOuts');
+    await queryInterface.dropTable('transactions');
   }
 };
