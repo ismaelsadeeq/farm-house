@@ -1,9 +1,38 @@
 var express = require('express');
 var router = express.Router();
+const passport = require('passport');
+const controller = require('../controllers/user.controller');
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+router.get('/all', 
+  passport.authenticate('jwt',{session:false}),
+  controller.getAllSHFAccount
+); 
+
+router.get('/', 
+  passport.authenticate('jwt',{session:false}),
+  controller.getSHFAccount
+);
+router.post('/create',
+  passport.authenticate('jwt',{session:false}),
+  controller.createSHFAccount
+);
+router.post('/login',
+  controller.farmerLogin
+);
+router.post('/create-pin',
+  controller.createPin
+);
+router.post('/logout',
+  passport.authenticate('jwt',{session:false}),
+  controller.farmerLogout
+);
+router.put('/',
+  passport.authenticate('jwt',{session:false}),
+  controller.updateSHFAccount
+);
+router.delete('/',
+  passport.authenticate('jwt',{session:false}),
+  controller.deleteSHFAccount
+);
 
 module.exports = router;

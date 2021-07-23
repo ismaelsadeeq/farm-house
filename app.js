@@ -26,10 +26,32 @@ require('./config/passport')(passport);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var adminRouter = require('./routes/admin');
+var superAdminRouter = require('./routes/superAdmin');
+var storageRouter = require('./routes/storage');
+var warehouseRouter = require('./routes/warehouse');
+var processingCenterRouter = require('./routes/processingCenter');
+var widthrawalsRouter = require('./routes/widrawals')
+var processedCommodityRouter = require('./routes/processedCommodity');
+var inventoryRouter = require('./routes/inventory');
+var loanRouter = require('./routes/loan');
+var loanCategoryRouter = require('./routes/loanCategory');
+var openApiUserRouter = require('./routes/open.api.users');
 
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/api/v1', indexRouter);
+app.use('/api/v1/users', usersRouter);
+app.use('/api/v1/admin', adminRouter);
+app.use('/api/v1/super-admin', superAdminRouter);
+app.use('/api/v1/storage', storageRouter);
+app.use('/api/v1/warehouse', warehouseRouter);
+app.use('/api/v1/mini-processing-center', processingCenterRouter);
+app.use('/api/v1/product-widthrawal', widthrawalsRouter);
+app.use('/api/v1/process', processedCommodityRouter);
+app.use('/api/v1/inventory', inventoryRouter);
+app.use('/api/v1/loan', loanRouter);
+app.use('/api/v1/loan-category', loanCategoryRouter)
+app.use('/api/v1/open-api/user', openApiUserRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
