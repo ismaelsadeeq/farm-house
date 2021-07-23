@@ -12,12 +12,21 @@ module.exports = (sequelize, DataTypes) => {
     soldCommodity.belongsTo(models.inventory,{
       foreignKey:'inventoryId'
     });
+    soldCommodity.belongsTo(models.deliveryAddress,{
+      foreignKey:'deliveryAddressId'
+    })
   }
   soldCommodity.init({
+    productName: DataTypes.STRING,
+    numberOfProduct: DataTypes.STRING,
+    productUnit: DataTypes.STRING,
+    pricePerUnit: DataTypes.STRING,
+    cummulativeProductPrice: DataTypes.STRING,
     time: DataTypes.STRING,
-    isDeliverd: DataTypes.BOOLEAN
+    isDelivered: DataTypes.BOOLEAN
   }, {
     sequelize,
+    paranoid:true,
     modelName: 'soldCommodity',
   });
   return soldCommodity;

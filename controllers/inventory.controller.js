@@ -84,9 +84,157 @@ const searchForAnInventory = async (req,res)=>{
   responseData.status = true;
   responseData.data = null;
 }
+const getPurchasedCommodities = async (req,res)=>{
+  const user = req.user;
+  const isAdmin = await models.admin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin){
+    const currentPage = parseInt(req.query.currentPage);
+    const pageLimit = parseInt(req.query.pageLimit);
 
+    const skip = currentPage * pageLimit;
+    const purchasedCommodities = await models.soldCommodities.findAll(
+      {
+        order:[['createdAt','DESC']],
+        offset:skip,
+        limit:pageLimit
+      }
+    );
+    if(!purchasedCommodities){
+      responseData.status = false;
+      responseData.message = "no purchased commodities at the moment";
+      responseData.data = null;
+      return res.json(responseData)
+    }
+    responseData.status = true;
+    responseData.message = "completed";
+    responseData.data = purchasedCommodities;
+    return res.json(responseData);
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Unauthorize");
+  }
+}
+const getPurchasedCommodity = async (req,res)=>{
+  const user = req.user;
+  const id = req.params.id;
+  const isAdmin = await models.admin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin){
+    const purchasedCommodity = await models.soldCommodities.findOne(
+      {
+        where:{
+          id:id
+        }
+      }
+    );
+    if(!purchasedCommodity){
+      responseData.status = false;
+      responseData.message = "no purchased commodities at the moment";
+      responseData.data = null;
+      return res.json(responseData)
+    }
+    responseData.status = true;
+    responseData.message = "completed";
+    responseData.data = purchasedCommodity;
+    return res.json(responseData);
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Unauthorize");
+  }
+}
+const delivered = async (req,res)=>{
+  const user = req.user;
+  const id = req.params.id
+  const isAdmin = await models.admin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin){
+    const purchasedCommodity = await models.soldCommodities.update(
+      {
+        isDelivered:true
+      },
+      {
+        where:{
+          id:id
+        }
+      }
+    );
+    if(!purchasedCommodity){
+      responseData.status = false;
+      responseData.message = "something went wrong";
+      responseData.data = null;
+      return res.json(responseData)
+    }
+    responseData.status = true;
+    responseData.message = "completed";
+    responseData.data = undefined;
+    return res.json(responseData);
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Unauthorize");
+  }
+}
+const unDelivered = async (req,res)=>{
+  const user = req.user;
+  const id = req.params.id
+  const isAdmin = await models.admin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin){
+    const purchasedCommodity = await models.soldCommodities.update(
+      {
+        isDelivered:false
+      },
+      {
+        where:{
+          id:id
+        }
+      }
+    );
+    if(!purchasedCommodity){
+      responseData.status = false;
+      responseData.message = "something went wrong";
+      responseData.data = null;
+      return res.json(responseData)
+    }
+    responseData.status = true;
+    responseData.message = "completed";
+    responseData.data = undefined;
+    return res.json(responseData);
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Unauthorize");
+  }
+}
 module.exports = {
   searchForAnInventory,
   getAllInventories,
-  getAnInventory
+  getAnInventory,
+  getPurchasedCommodities,
+  getPurchasedCommodity,
+  delivered,
+  unDelivered
 }

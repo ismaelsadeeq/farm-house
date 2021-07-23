@@ -204,9 +204,60 @@ const editUser = async (req,res)=>{
   responseData.message = "user is updated";
   return res.json(responseData);
 }
-const addBvn = await (req,res)=> {
-  const data = req.body;
-  const
+const addBvn = async (req,res) =>{
+  const user = req.user;
+  const isBvnVerified = await models.user.findOne(
+    {
+      where:{
+        id:user.id,
+        isBvnVerified:false || null
+      }
+    }
+  );
+  if(!isBvnVerified){
+    responseData.status = true;
+    responseData.message = "Customer already identified";
+    responseData.data = null
+    return res.json(responseData);
+  }
+  const updateBvn = await models.user.update(
+    {
+      bvnNumber:data.bvnNumber
+    },
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(!updateBvn){
+    responseData.status = false;
+    responseData.message = "something went wrong";
+    responseData.data = null
+    return res.json(responseData);
+  }
+  const wallet = await models.wallet.findOne(
+    {
+      where:{
+        userId:user.id
+      }
+    }
+  );
+  const userr = await models.user.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  )
+  const validate = await paystackApi.validateCustomer(
+    wallet.customerCode,
+    userr
+  );
+  responseData.status = true;
+  responseData.message = "Bvn updated awaiting validation";
+  responseData.data = null
+  return res.json(responseData);
 }
 const verifyEmail = async (req,res)=>{
   const data = req.body;
@@ -217,12 +268,41 @@ const verifyEmail = async (req,res)=>{
       responseData.message = 'Account is already verified';
       return res.json(responseData);
     } 
-      const userr = await models.user.findOne({where:{id:code.userId}});
-      await models.user.update({isAccountVerified:true},{where:{id:code.userId}});
-      const wallet = await models.wallet.findOne({where:{userId:code.userId}})
-      const createAccount = await paystackApi.createNobaDedicatedAccount(wallet.customerCode,code.userId)
-      const validate = await paystackApi.validateCustomer(wallet.customerCode,userr)
-      await models.otpCode.destroy({where:{code:data.code}})
+      const userr = await models.user.findOne(
+        {
+          where:{id:code.userId}
+        }
+      );
+      const wallet = await models.wallet.findOne(
+        {
+          where:{userId:code.userId}
+        }
+      )
+      const createAccount = await paystackApi.createNobaDedicatedAccount(
+        wallet.customerCode,
+        code.userId
+      )
+      const publicKey = uuid.v4();
+      const privateKey = uuid.v4();
+      const encryptedPublicKey = helpers.encrypt(publicKey);
+      const encryptedPrivateKey = helpers.encrypt(privateKey);
+      const updateUser = await models.user.update(
+        {
+          isAccountVerified:true,
+          privateKey:encryptedPrivateKey,
+          publicKey:encryptedPublicKey
+        },
+        {
+          where:{
+            id:code.userId
+          }
+        }
+      )
+      await models.otpCode.destroy(
+        {
+          where:{code:data.code}
+        }
+      )
       let names = userr.firstName +' '+ userr.lastName;
       const msg = "Hello "+userr.firstName+", your NobaAfrica Account is successfully Verified";
       const htmlPart = `<div>
@@ -244,11 +324,72 @@ const verifyEmail = async (req,res)=>{
       responseData.message = 'Account Verified';
       responseData.status = true;
       return res.json(responseData);
-  }else{
+  } else {
     responseData.status = false,
     responseData.message = 'Invalid Code entered';
     return res.json(responseData)
   }
+}
+const getKeys = async (req,res)=>{
+  const user = req.user;
+  const encryptedKeys = await models.user.findOne(
+    {
+      where:{
+        id:user.id
+      },
+      attributes:['privateKey	','publicKey']
+    }
+  );
+  if(!encryptedKeys){
+    responseData.status = false;
+    responseData.message = "something went wrong";
+    responseData.data = null
+    return res.json(responseData);
+  }
+  const encryptedPublicKey = encryptedKeys.publicKey;
+  const encryptedPrivateKey = encryptedKeys.privateKey;
+  const decryptedPublicKey = helpers.decrypt(encryptedPublicKey);
+  const decryptedPrivateKey = helpers.decrypt(encryptedPrivateKey);
+  const keys = {
+    publicKey:decryptedPublicKey,
+    privateKey:decryptedPrivateKey
+  }
+  responseData.status = true;
+  responseData.message = "completed";
+  responseData.data = keys
+  return res.json(responseData);
+}
+const generateNewKeys = async (req,res)=>{
+  const user = req.user;
+  const publicKey = uuid.v4();
+  const privateKey = uuid.v4();
+  const encryptedPublicKey = helpers.encrypt(publicKey);
+  const encryptedPrivateKey = helpers.encrypt(privateKey);
+  const updateUser = await models.user.update(
+    {
+      privateKey:encryptedPrivateKey,
+      publicKey:encryptedPublicKey
+    },
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(!updateUser){
+    responseData.status = false;
+    responseData.message = "something went wrong";
+    responseData.data = null
+    return res.json(responseData);
+  }
+  responseData.status = true;
+  responseData.message = "keys Generated";
+  const keys = {
+    publicKey:publicKey,
+    privateKey:privateKey
+  }
+  responseData.data = keys
+  return res.json(responseData);
 }
 const resetPassword = async  (req,res)=>{
   data = req.body;
@@ -342,7 +483,7 @@ async function changePassword(req,res){
 } 
 const getUser = async  (req,res)=>{
   const user = req.user;
-  const user = await models.user.findOne(
+  const userDetails = await models.user.findOne(
     {
       where:{
         id:user.id
@@ -353,12 +494,12 @@ const getUser = async  (req,res)=>{
   if(user){
     responseData.status = true;
     responseData.message = "completed";
-    responseData.data = user
+    responseData.data = userDetails
     return res.json(responseData);
   }
   responseData.status = true;
   responseData.message = "something went wrong";
-  responseData.data = user
+  responseData.data = null
   return res.json(responseData);
 }
 const deleteUser = async (req,res)=>{
@@ -375,6 +516,129 @@ const deleteUser = async (req,res)=>{
   return res.json(responseData);
 }
 
+const createDeliveryAddress = async (req,res)=>{
+  const user = req.user;
+  const data = req.body;
+  const createAddress = await models.deliveryAddress.create(
+    {
+      id:uuid.v4(),
+      userId:user.id,
+      state:data.state,
+      lga:data.lga,
+      postalCode:data.postalCode,
+      address:data.address
+    }
+  );
+  if(!createAddress){
+    responseData.status = false;
+    responseData.message = "something went wrong";
+    responseData.data = null
+    return res.json(responseData);
+  }
+  responseData.status = true;
+  responseData.message = "completed";
+  responseData.data = createAddress
+  return res.json(responseData);
+}
+const editDeliveryAddress = async (req,res)=>{
+  const user = req.user;
+  const data = req.body;
+  const id = req.params.id;
+  const updateAddress = await models.deliveryAddress.update(
+    {
+      userId:user.id,
+      state:data.state,
+      lga:data.lga,
+      postalCode:data.postalCode,
+      address:data.address
+    },
+    {
+      where:{
+        id:id
+      }
+    }
+  );
+  if(!updateAddress){
+    responseData.status = false;
+    responseData.message = "something went wrong";
+    responseData.data = null
+    return res.json(responseData);
+  }
+  responseData.status = true;
+  responseData.message = "updated";
+  responseData.data = null
+  return res.json(responseData);
+}
+const deleteDeliveryAddress = async (req,res)=>{
+  const user = req.user;
+  const data = req.body;
+  const id = req.params.id;
+  const deleteAddress = await models.deliveryAddress.destroy(
+    {
+      where:{
+        id:id
+      }
+    }
+  );
+  if(!deleteAddress){
+    responseData.status = false;
+    responseData.message = "something went wrong";
+    responseData.data = null
+    return res.json(responseData);
+  }
+  responseData.status = true;
+  responseData.message = "deleted";
+  responseData.data = null
+  return res.json(responseData);
+}
+const getDeliveryAddresses = async (req,res)=>{
+  const user = req.user;
+  let pageLimit = parseInt(req.query.pageLimit);
+  let currentPage = parseInt(req.query.currentPage);
+  let	skip = currentPage * pageLimit
+  const adresses = await models.deliveryAddress.findAll(
+    {
+      order:[['createdAt','DESC']],
+			offset:skip,
+			limit:pageLimit,
+      where:{
+        userId:user.id
+      }
+    }
+  );
+  if(!adresses){
+    responseData.status = false;
+    responseData.message = "something went wrong";
+    responseData.data = null
+    return res.json(responseData);
+  }
+  responseData.status = true;
+  responseData.message = "updated";
+  responseData.data = adresses
+  return res.json(responseData);
+}
+const getDeliveryAddress = async (req,res)=>{
+  const user = req.user;
+  const data = req.body;
+  const id = req.params.id;
+  const address = await models.deliveryAddress.findOne(
+    {
+      where:{
+        id:id
+      }
+    }
+  );
+  if(!address){
+    responseData.status = false;
+    responseData.message = "something went wrong";
+    responseData.data = null
+    return res.json(responseData);
+  }
+  responseData.status = true;
+  responseData.message = "updated";
+  responseData.data = address
+  return res.json(responseData)
+}
 const sendEmail= (data)=>{
   const sendMail = mailer.sendMail(data.email, data.variables,data.msg)
  if(sendMail){
@@ -394,5 +658,13 @@ module.exports = {
   getUser,
   editUser,
   changePassword,
-  deleteUser
+  deleteUser,
+  getKeys,
+  generateNewKeys,
+  addBvn,
+  createDeliveryAddress,
+  editDeliveryAddress,
+  deleteDeliveryAddress,
+  getDeliveryAddresses,
+  getDeliveryAddress
 }

@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('soldCommodities', {
+    await queryInterface.createTable('deliveryAddresses', {
       id: {
         allowNull: false,
         primaryKey: true,
@@ -18,21 +18,17 @@ module.exports = {
           as:'userId'
         }
       },
-      inventoryId: {
-        type: Sequelize.UUID,
-        allowNull:true,
-        onDelete:'CASCADE',
-        references:{
-          model:'inventories',
-          key:'id',
-          as:'inventoryId'
-        }
-      },
-      time: {
+      state: {
         type: Sequelize.STRING
       },
-      isDeliverd: {
-        type: Sequelize.BOOLEAN
+      lga: {
+        type: Sequelize.STRING
+      },
+      address: {
+        type: Sequelize.STRING
+      },
+      postalCode: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -48,6 +44,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('soldCommodities');
+    await queryInterface.dropTable('deliveryAddresses');
   }
 };

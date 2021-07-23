@@ -13,6 +13,22 @@ router.get('/:id',
 router.get('/',
   controller.searchForAnInventory
 );
+router.get('/purchased',
+  passport.authenticate('jwt',{session:false}),
+  controller.getPurchasedCommodities
+);
+router.get('/purchased/:id',
+  passport.authenticate('jwt',{session:false}),
+  controller.getPurchasedCommodity
+);
+router.put('/deliver/:id',
+  passport.authenticate('jwt',{session:false}),
+  controller.delivered
+);
+router.put('/un-deliver/:id',
+  passport.authenticate('jwt',{session:false}),
+  controller.unDelivered
+);
 
 
 module.exports = router;
