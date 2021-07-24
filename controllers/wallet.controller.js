@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const mailer = require("../utilities/mailjet");
 const helpers = require("../utilities/helpers");
 const paystackApi = require('../utilities/paystack.api');
+const crypto = require('crypto');
 require("dotenv").config();
 const mailjet = require ("node-mailjet").connect(process.env.MAILJET_PUBLIC,process.env.MAILJET_PRIVATE);
 
@@ -17,7 +18,7 @@ const responseData = {
 
 const nubanWebhook =async (req,res)=>{
   //validate event
-  let hash = crypto.createHmac('sha512', secret).update(JSON.stringify(req.body)).digest('hex');
+  let hash = crypto.createHmac('sha512', process.env.PAYSTACK_SECRET).update(JSON.stringify(req.body)).digest('hex');
   console.log(hash);
   if (hash == req.headers['x-paystack-signature']) {
     // Retrieve the request's body
@@ -128,12 +129,11 @@ const getBalanceWithToken = async (req,res)=>{
     res.statusCode = 401;
 	  return res.json('unauthorize');
   }
-  let plainPublicKey = key.substring(6,key.length);
-  const encryptedPublickey = helpers.encrypt(plainPublicKey);
+  let publicKey = key.substring(7,key.length);
   const user = await models.user.findOne(
     {
       where:{
-        publicKey:encryptedPublickey,
+        publicKey:publicKey,
         email:email
       }
     }
@@ -210,12 +210,11 @@ const getAccountDetailsWithAPI = async (req,res)=>{
     res.statusCode = 401;
 	  return res.json('unauthorize');
   }
-  let plainPublicKey = key.substring(6,key.length);
-  const encryptedPublickey = helpers.encrypt(plainPublicKey);
+  let publicKey = key.substring(7,key.length);
   const user = await models.user.findOne(
     {
       where:{
-        publicKey:encryptedPublickey,
+        publicKey:publicKey,
         email:email
       }
     }
@@ -245,19 +244,18 @@ const getAccountDetailsWithAPI = async (req,res)=>{
 }
 const buyACommodity = async (req,res)=>{
   const commodityId = req.params.commodityId;
-  const deliveryAddressId = req.params.deliveryAddressId
+  const deliveryAddressId = req.body.deliveryAddressId
   const data = req.body;
   const key = req.headers.authorization;
   if(!key){
     res.statusCode = 401;
 	  return res.json('unauthorize');
   }
-  let plainPublicKey = key.substring(6,key.length);
-  const encryptedPublickey = helpers.encrypt(plainPublicKey);
+  let publicKey = key.substring(7,key.length);
   const user = await models.user.findOne(
     {
       where:{
-        publicKey:encryptedPublickey,
+        publicKey:publicKey,
         email:data.email
       }
     }
@@ -321,7 +319,7 @@ const buyACommodity = async (req,res)=>{
   );
   const newNumberOfProduct = parseFloat(inventory.numberOfProduct) - parseFloat(numberOfProduct);
   const newCommulativePrice = newNumberOfProduct * parseFloat(inventory.pricePerUnit)
-  const updateInventory = await models.inventory.create(
+  const updateInventory = await models.inventory.update(
     {
       numberOfProduct:newNumberOfProduct,
       cummulativeProductPrice:newCommulativePrice
@@ -334,15 +332,17 @@ const buyACommodity = async (req,res)=>{
   );
   let date = new Date();
   date = date.toLocaleString();
-  const createSoldProduct = await models.soldProduct.create(
+  console.log()
+  const createSoldProduct = await models.soldCommodity.create(
     {
       id:uuid.v4(),
+      userId:wallet.userId,
       inventoryId:commodityId,
       deliveryAddressId:deliveryAddressId,
       productName:inventory.productName,
       numberOfProduct:numberOfProduct,
-      priceUnit:inventory.productUnit,
-      productPerUnit:inventory.pricePerUnit,
+      productUnit:inventory.productUnit,
+      pricePerUnit:inventory.pricePerUnit,
       cummulativeProductPrice:parseFloat(numberOfProduct) * parseFloat(inventory.pricePerUnit),
       time:date
     }
@@ -357,7 +357,7 @@ const getPurchasedCommodities = async (req,res)=>{
   let pageLimit = parseInt(req.query.pageLimit);
   let currentPage = parseInt(req.query.currentPage);
   let	skip = currentPage * pageLimit
-  const purchasedCommodities = await models.soldCommodities.findAll(
+  const purchasedCommodities = await models.soldCommodity.findAll(
     {
       order:[['createdAt','DESC']],
 			offset:skip,
@@ -385,12 +385,11 @@ const getPurchasedCommoditiesWithAPI = async (req,res)=>{
     res.statusCode = 401;
 	  return res.json('unauthorize');
   }
-  let plainPublicKey = key.substring(6,key.length);
-  const encryptedPublickey = helpers.encrypt(plainPublicKey);
+  let publicKey = key.substring(7,key.length);
   const user = await models.user.findOne(
     {
       where:{
-        publicKey:encryptedPublickey,
+        publicKey:publicKey,
         email:email
       }
     }
@@ -402,7 +401,7 @@ const getPurchasedCommoditiesWithAPI = async (req,res)=>{
   let pageLimit = parseInt(req.query.pageLimit);
   let currentPage = parseInt(req.query.currentPage);
   let	skip = currentPage * pageLimit
-  const purchasedCommodities = await models.soldCommodities.findAll(
+  const purchasedCommodities = await models.soldCommodity.findAll(
     {
       order:[['createdAt','DESC']],
 			offset:skip,
@@ -431,12 +430,11 @@ const getPurchasedCommodityWithAPI = async (req,res)=>{
     res.statusCode = 401;
 	  return res.json('unauthorize');
   }
-  let plainPublicKey = key.substring(6,key.length);
-  const encryptedPublickey = helpers.encrypt(plainPublicKey);
+  let publicKey = key.substring(7,key.length);
   const user = await models.user.findOne(
     {
       where:{
-        publicKey:encryptedPublickey,
+        publicKey:publicKey,
         email:email
       }
     }
@@ -445,7 +443,7 @@ const getPurchasedCommodityWithAPI = async (req,res)=>{
     res.statusCode = 401;
 	  return res.json('unauthorize');
   }
-  const purchasedCommodities = await models.soldCommodities.findOne(
+  const purchasedCommodities = await models.soldCommodity.findOne(
     {
       where:{
         id:id
@@ -464,8 +462,8 @@ const getPurchasedCommodityWithAPI = async (req,res)=>{
   return res.json(responseData);
 }
 const getPurchasedCommodity = async (req,res)=>{
-  const id = req.params.id;
-  const purchasedCommodity = await models.soldCommodities.findOne(
+  const id = req.params.soldCommodityId
+  const purchasedCommodity = await models.soldCommodity.findOne(
     {
       where:{
         id:id

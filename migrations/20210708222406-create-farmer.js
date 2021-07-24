@@ -22,7 +22,7 @@ module.exports = {
       photoId: {
         type: Sequelize.STRING
       },
-      Biometric: {
+      biometric: {
         unique:true,
         type: Sequelize.STRING
       },
@@ -36,11 +36,23 @@ module.exports = {
         unique:true,
         type: Sequelize.STRING
       },
+      accountName: {
+        type: Sequelize.STRING
+      },
       accountNumber: {
         unique:true,
         type: Sequelize.STRING
       },
       bank: {
+        type: Sequelize.STRING
+      },
+      secretQuestion: {
+        type: Sequelize.STRING
+      },
+      secretAnswer: {
+        type: Sequelize.STRING
+      },
+      signature: {
         type: Sequelize.STRING
       },
       hasPin : {

@@ -58,7 +58,7 @@ const storeProduct = async (req,res)=>{
      of ${productStore.productName} dated ${dateStoredString}
      Thank you
      `
-    await smsGlobal.sendMessage(process.env.FARMER_HQ_NUMBER,phoneNumber,message);
+    await smsGlobal.sendMessage(process.env.FARMER_HQ_NUMBER,farmer.phoneNumber,message);
     responseData.message = "storage created";
     responseData.status = true;
     responseData.data = productStore;
@@ -517,7 +517,7 @@ const queryFarmer = async (req,res)=>{
         is now ready to be sold in the market at ${data.price} per ${productExist.unit}, ${process.env.FARMER_MESSAGE}
         Thank you 
       `
-      const farmerPhone = productExist.phoneNumber
+      const farmerPhone = farmer.phoneNumber
       await smsGlobal.sendMessage(process.env.FARMER_HQ_NUMBER,farmerPhone,message);
       responseData.message = `Message sent`;
       responseData.status = true;
@@ -544,8 +544,7 @@ const changeStatusToForSale = async (req,res)=>{
       }
     }
   );
-  if(isUser){
-    const data = req.body;
+  if(!isUser){
     const storageId = req.params.storageId;
     const productExist = await models.productStorage.findOne(
       {
@@ -556,7 +555,6 @@ const changeStatusToForSale = async (req,res)=>{
     );
     if(productExist){
       let commulativePrice = parseFloat(productExist.peggedPrice) * parseFloat(productExist.numberOfProduct)
-      console.log(data.pricePerUnit);
       await models.productStorage.update(
         {
           isForSale:true
@@ -602,7 +600,7 @@ const changeStatusToNotForSale = async (req,res)=>{
       }
     }
   );
-  if(isUser){
+  if(!isUser){
     const storageId = req.params.storageId;
     const productExist = await models.productStorage.findOne(
       {

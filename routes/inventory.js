@@ -2,17 +2,6 @@ var express = require('express');
 var router = express.Router();
 const passport = require('passport');
 const controller = require('../controllers/inventory.controller');
-
-router.get('/all',
-  controller.getAllInventories
-);
-router.get('/:id',
-  controller.getAnInventory
-);
-
-router.get('/',
-  controller.searchForAnInventory
-);
 router.get('/purchased',
   passport.authenticate('jwt',{session:false}),
   controller.getPurchasedCommodities
@@ -28,6 +17,16 @@ router.put('/deliver/:id',
 router.put('/un-deliver/:id',
   passport.authenticate('jwt',{session:false}),
   controller.unDelivered
+);
+router.get('/all',
+  controller.getAllInventories
+);
+router.get('/:id',
+  controller.getAnInventory
+);
+
+router.get('/',
+  controller.searchForAnInventory
 );
 
 

@@ -11,7 +11,7 @@ router.get('/gennerate-keys',
   passport.authenticate('jwt',{session:false}),
   controller.generateNewKeys
 );
-router.get('/add-bvn', 
+router.post('/add-bvn', 
   passport.authenticate('jwt',{session:false}),
   controller.addBvn
 );
@@ -23,7 +23,7 @@ router.put('/delivery/:id',
   passport.authenticate('jwt',{session:false}),
   controller.editDeliveryAddress
 );
-router.delete('/delivery',
+router.delete('/delivery/:id',
   passport.authenticate('jwt',{session:false}),
   controller.deleteDeliveryAddress
 );

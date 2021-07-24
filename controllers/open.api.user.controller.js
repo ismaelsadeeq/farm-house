@@ -189,8 +189,7 @@ const editUser = async (req,res)=>{
       firstName:data.firstname,
       lastName:data.lastname,
       email:data.email,
-      phoneNumber:data.phoneNumber,
-      bvnNumber:data.bvnNumber
+      phoneNumber:data.phoneNumber
     },
     {
       where:{
@@ -206,6 +205,7 @@ const editUser = async (req,res)=>{
 }
 const addBvn = async (req,res) =>{
   const user = req.user;
+  const data = req.body;
   const isBvnVerified = await models.user.findOne(
     {
       where:{
@@ -284,13 +284,12 @@ const verifyEmail = async (req,res)=>{
       )
       const publicKey = uuid.v4();
       const privateKey = uuid.v4();
-      const encryptedPublicKey = helpers.encrypt(publicKey);
-      const encryptedPrivateKey = helpers.encrypt(privateKey);
+
       const updateUser = await models.user.update(
         {
           isAccountVerified:true,
-          privateKey:encryptedPrivateKey,
-          publicKey:encryptedPublicKey
+          privateKey:privateKey,
+          publicKey:publicKey
         },
         {
           where:{
@@ -332,27 +331,19 @@ const verifyEmail = async (req,res)=>{
 }
 const getKeys = async (req,res)=>{
   const user = req.user;
-  const encryptedKeys = await models.user.findOne(
+  const keys = await models.user.findOne(
     {
       where:{
         id:user.id
       },
-      attributes:['privateKey	','publicKey']
+      attributes:['privateKey','publicKey']
     }
   );
-  if(!encryptedKeys){
+  if(!keys){
     responseData.status = false;
     responseData.message = "something went wrong";
     responseData.data = null
     return res.json(responseData);
-  }
-  const encryptedPublicKey = encryptedKeys.publicKey;
-  const encryptedPrivateKey = encryptedKeys.privateKey;
-  const decryptedPublicKey = helpers.decrypt(encryptedPublicKey);
-  const decryptedPrivateKey = helpers.decrypt(encryptedPrivateKey);
-  const keys = {
-    publicKey:decryptedPublicKey,
-    privateKey:decryptedPrivateKey
   }
   responseData.status = true;
   responseData.message = "completed";
@@ -363,12 +354,10 @@ const generateNewKeys = async (req,res)=>{
   const user = req.user;
   const publicKey = uuid.v4();
   const privateKey = uuid.v4();
-  const encryptedPublicKey = helpers.encrypt(publicKey);
-  const encryptedPrivateKey = helpers.encrypt(privateKey);
   const updateUser = await models.user.update(
     {
-      privateKey:encryptedPrivateKey,
-      publicKey:encryptedPublicKey
+      privateKey:privateKey,
+      publicKey:publicKey
     },
     {
       where:{
@@ -635,7 +624,7 @@ const getDeliveryAddress = async (req,res)=>{
     return res.json(responseData);
   }
   responseData.status = true;
-  responseData.message = "updated";
+  responseData.message = "completed";
   responseData.data = address
   return res.json(responseData)
 }

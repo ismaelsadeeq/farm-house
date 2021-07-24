@@ -98,7 +98,7 @@ const getPurchasedCommodities = async (req,res)=>{
     const pageLimit = parseInt(req.query.pageLimit);
 
     const skip = currentPage * pageLimit;
-    const purchasedCommodities = await models.soldCommodities.findAll(
+    const purchasedCommodities = await models.soldCommodity.findAll(
       {
         order:[['createdAt','DESC']],
         offset:skip,
@@ -132,7 +132,7 @@ const getPurchasedCommodity = async (req,res)=>{
     }
   );
   if(isAdmin){
-    const purchasedCommodity = await models.soldCommodities.findOne(
+    const purchasedCommodity = await models.soldCommodity.findOne(
       {
         where:{
           id:id
@@ -166,7 +166,7 @@ const delivered = async (req,res)=>{
     }
   );
   if(isAdmin){
-    const purchasedCommodity = await models.soldCommodities.update(
+    const purchasedCommodity = await models.soldCommodity.update(
       {
         isDelivered:true
       },
@@ -203,7 +203,7 @@ const unDelivered = async (req,res)=>{
     }
   );
   if(isAdmin){
-    const purchasedCommodity = await models.soldCommodities.update(
+    const purchasedCommodity = await models.soldCommodity.update(
       {
         isDelivered:false
       },

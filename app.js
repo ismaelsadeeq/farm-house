@@ -37,7 +37,7 @@ var inventoryRouter = require('./routes/inventory');
 var loanRouter = require('./routes/loan');
 var loanCategoryRouter = require('./routes/loanCategory');
 var openApiUserRouter = require('./routes/open.api.users');
-
+var walletRouter = require('./routes/wallet')
 
 app.use('/api/v1', indexRouter);
 app.use('/api/v1/users', usersRouter);
@@ -52,6 +52,8 @@ app.use('/api/v1/inventory', inventoryRouter);
 app.use('/api/v1/loan', loanRouter);
 app.use('/api/v1/loan-category', loanCategoryRouter)
 app.use('/api/v1/open-api/user', openApiUserRouter);
+app.use('/api/v1/wallet', walletRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -23,7 +23,7 @@ const createSHFAccount = async (req,res) =>{
     }
   );
   if(isAdmin){
-    multerConfig.singleUpload(req, res, async function(err) {
+    multerConfig.multipleUpload(req, res, async function(err) {
 			if (err instanceof multer.MulterError) {
         responseData.status = false,
         res.statusCode = 200;
@@ -51,14 +51,16 @@ const createSHFAccount = async (req,res) =>{
         const createFarmer = await models.farmer.create(
           {
             id:uuid.v4(),
-            photoId:req.file.path[0],
+            photoId:req.files[0].path,
             //Biometrics
             firstname :data.firstname,
             lastname:data.lastname,
             address:data.address,
             state:data.state,
             phoneNumber:data.phoneNumber,
-            signature:req.file.path[1]
+            signature:req.files[1].path,
+            secretQuestion:data.secretQuestion,
+            secretAnswer:data.secretAnswer
           }
         )
         if(createFarmer){
