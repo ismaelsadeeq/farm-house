@@ -17,7 +17,10 @@ module.exports = (sequelize, DataTypes) => {
     });
     productStorage.hasOne(models.inventory,{
       foreignKey:'productStorageId'
-    })
+    });
+    productStorage.belongsTo(models.category,{
+      foreignKey:'categoryId'
+    });
   }
   productStorage.init({
     storageAccountName : DataTypes.STRING,

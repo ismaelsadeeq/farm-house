@@ -15,6 +15,9 @@ module.exports = (sequelize, DataTypes) => {
     inventory.hasMany(models.soldCommodity,{
       foreignKey:'inventoryId'
     });
+    inventory.belongsTo(models.category,{
+      foreignKey:'categoryId'
+    });
   }
   inventory.init({
     productName: DataTypes.STRING,
