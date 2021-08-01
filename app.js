@@ -54,17 +54,6 @@ app.use('/api/v1/loan-category', loanCategoryRouter)
 app.use('/api/v1/open-api/user', openApiUserRouter);
 app.use('/api/v1/wallet', walletRouter);
 
-// Setup:
-const WooCommerceRestApi = require("@woocommerce/woocommerce-rest-api").default;
-// import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api"; // Supports ESM
-
-const WooCommerce = new WooCommerceRestApi({
-  url: 'http://localhost/wordpress', // Your store URL
-  consumerKey: process.env.WORDPRESS_CONSUMER, // Your consumer key
-  consumerSecret: process.env.WORDPRESS_CONSUMER_SECRET, // Your consumer secret
-  version: 'wc/v3' // WooCommerce WP REST API version
-});
-
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

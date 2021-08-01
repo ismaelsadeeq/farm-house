@@ -5,6 +5,7 @@ const uuid = require('uuid');
 const helpers = require('../utilities/helpers');
 const smsGlobal = require('../utilities/sms.api');
 const { Op } = require("sequelize");
+const wooCommerce = require('../config/wooCommerce').WooCommerce
 
 require('dotenv').config();
 
@@ -14,7 +15,17 @@ const responseData = {
 	message: "Completed",
 	data: null
 }
+const testApi = async = (req,res)=>{
+  wooCommerce.get("")
+  .then((response) => {
+    console.log((response.data));
+    return res.json(response)
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 
+}
 const getAllInventories =  async (req,res)=>{
   const currentPage = parseInt(req.query.currentPage);
   const pageLimit = parseInt(req.query.pageLimit);
@@ -236,5 +247,6 @@ module.exports = {
   getPurchasedCommodities,
   getPurchasedCommodity,
   delivered,
-  unDelivered
+  unDelivered,
+  testApi
 }
