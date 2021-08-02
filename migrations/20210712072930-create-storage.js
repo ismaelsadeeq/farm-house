@@ -18,6 +18,16 @@ module.exports = {
           as:'farmerId'
         }
       },
+      categoryId: {
+        type: Sequelize.UUID,
+        allowNull:true,
+        onDelete:'CASCADE',
+        references:{
+          model:'catogories',
+          key:'id',
+          as:'categoryId'
+        }
+      },
       warehouseId: {
         type: Sequelize.UUID,
         allowNull:false,

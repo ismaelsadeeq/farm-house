@@ -12,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
     processedCommodity.belongsTo(models.farmer,{
       foreignKey:'farmerId'
     });
+    processedCommodity.belongsTo(models.category,{
+      foreignKey:'categoryId'
+    });
   }
   processedCommodity.init({
     commodityName: DataTypes.STRING,

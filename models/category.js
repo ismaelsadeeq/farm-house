@@ -12,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
     category.hasMany(models.inventory,{
       foreignKey:'categoryId'
     });
+    category.hasMany(models.processedCommodity,{
+      foreignKey:'categoryId'
+    });
   }
   category.init({
     name: DataTypes.STRING,
