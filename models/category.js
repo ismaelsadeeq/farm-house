@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   class category extends Model {
   };
   category.associate = function(models){
-    category.hasMany(models.storage,{
+    category.hasMany(models.productStorage,{
       foreignKey:'categoryId'
     });
     category.hasMany(models.inventory,{
