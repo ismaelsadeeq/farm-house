@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   category.init({
     name: DataTypes.STRING,
+    wooCommerceId:DataTypes.STRING,
     description: DataTypes.STRING
   }, {
     sequelize,
