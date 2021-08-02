@@ -2,7 +2,8 @@
 const models = require('../models');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
-const helpers = require('../utilities/helpers')
+const helpers = require('../utilities/helpers');
+const wooCommerce = require('../config/wooCommerce').WooCommerce
 require('dotenv').config();
 
 //response
@@ -31,7 +32,8 @@ const createProcess = async (req,res)=>{
         farmerId:farmerId,
         commodityName:data.commodityName,
         processingCenterId:centerId,
-        isProcessed:false
+        isProcessed:false,
+        categoryId:data.categoryId
       }
     );
     if(addCommodity){
@@ -263,6 +265,7 @@ const storeProduct = async (req,res)=>{
           farmerId:commodity.farmerId,
           warehouseId:warehouseId,
           productName:commodity.commodityName,
+          categoryId:commodity.categoryId,
           numberOfProduct:commodity.commodityQuantity,
           unit:commodity.commodityUnit,
           dateStored:dateStored,
