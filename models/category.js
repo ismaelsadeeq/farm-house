@@ -5,7 +5,7 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class category extends Model {
   };
-  catogory.associate = function(models){
+  category.associate = function(models){
     category.hasMany(models.storage,{
       foreignKey:'categoryId'
     });
