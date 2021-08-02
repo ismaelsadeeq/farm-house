@@ -39,6 +39,7 @@ var loanCategoryRouter = require('./routes/loanCategory');
 var openApiUserRouter = require('./routes/open.api.users');
 var walletRouter = require('./routes/wallet');
 var categoryRouter = require('./routes/category');
+var webhookRouter = require('./routes/webhook')
 
 app.use('/api/v1', indexRouter);
 app.use('/api/v1/users', usersRouter);
@@ -55,6 +56,7 @@ app.use('/api/v1/loan-category', loanCategoryRouter)
 app.use('/api/v1/open-api/user', openApiUserRouter);
 app.use('/api/v1/wallet', walletRouter);
 app.use('/api/v1/category', categoryRouter);
+app.use('/api/v1/webhook', webhookRouter)
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

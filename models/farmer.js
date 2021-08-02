@@ -27,6 +27,9 @@ module.exports = (sequelize, DataTypes) => {
     farmer.hasMany(models.loan,{
       foreignKey:'farmerId'
     });
+    farmer.hasOne(models.farmerWallet,{
+      foreignKey:'farmerId'
+    });
   }
   farmer.init({
     firstname: DataTypes.STRING,
