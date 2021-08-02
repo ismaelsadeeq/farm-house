@@ -2,9 +2,6 @@ var express = require('express');
 var router = express.Router();
 const passport = require('passport');
 const controller = require('../controllers/inventory.controller');
-router.get('/woo-commerce',
-  controller.testApi
-)
 router.get('/purchased',
   passport.authenticate('jwt',{session:false}),
   controller.getPurchasedCommodities
