@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     numberOfProduct: DataTypes.STRING,
     productUnit: DataTypes.STRING,
     pricePerUnit: DataTypes.STRING,
+    wooCommerceProductId:DataTypes.STRING,
     cummulativeProductPrice: DataTypes.STRING
   }, {
     sequelize,

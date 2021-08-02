@@ -50,6 +50,9 @@ module.exports = {
       pricePerUnit: {
         type: Sequelize.STRING
       },
+      wooCommerceProductId: {
+        type: Sequelize.STRING
+      },
       cummulativeProductPrice: {
         type: Sequelize.STRING
       },

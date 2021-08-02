@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 const helpers = require('../utilities/helpers');
 const smsGlobal = require('../utilities/sms.api');
+const wooCommerce = require('../config/wooCommerce').WooCommerce
 require('dotenv').config();
 
 //response
@@ -37,6 +38,7 @@ const storeProduct = async (req,res)=>{
       {
         id:uuid.v4(),
         farmerId:data.farmerId,
+        categoryId:data.categoryId,
         storageAccountName:farmer.firstname,
         storageAccountNumber:helpers.generateOTP(),
         warehouseId:data.warehouseId,
@@ -555,27 +557,54 @@ const changeStatusToForSale = async (req,res)=>{
     );
     if(productExist){
       let commulativePrice = parseFloat(productExist.peggedPrice) * parseFloat(productExist.numberOfProduct)
-      await models.productStorage.update(
+      const category = await models.category.findOne(
         {
-          isForSale:true
-        },{
           where:{
-            id:storageId
+            id:productExist.categoryId,
           }
         }
-      );
-      const createInventory = await models.inventory.create(
-        {
-          id:uuid.v4(),
-          farmerId:productExist.farmerId,
-          productName:productExist.productName,
-          productStorageId:storageId,
-          cummulativeProductPrice:commulativePrice,
-          numberOfProduct:productExist.numberOfProduct,
-          productUnit:productExist.unit,
-          pricePerUnit:productExist.peggedPrice
-        }
-      );
+      )
+      const payload = {
+        name: productExist.productName,
+        type: productExist.unit,
+        regular_price: productExist.peggedPrice,
+        short_description:`One ${productExist.unit} of ${productExist.productName} is ${productExist.peggedPrice}` ,
+        categories: [
+          {
+            id:category.wooCommerceId
+          }
+        ],
+      };
+      wooCommerce.post("products", payload)
+        .then(async (response) => {
+          console.log(response.data);
+          await models.productStorage.update(
+            {
+              isForSale:true
+            },{
+              where:{
+                id:storageId
+              }
+            }
+          );
+          const createInventory = await models.inventory.create(
+            {
+              id:uuid.v4(),
+              farmerId:productExist.farmerId,
+              categoryId:productExist.categoryId,
+              productName:productExist.productName,
+              productStorageId:storageId,
+              wooCommerceProductId:response.data.id,
+              cummulativeProductPrice:commulativePrice,
+              numberOfProduct:productExist.numberOfProduct,
+              productUnit:productExist.unit,
+              pricePerUnit:productExist.peggedPrice
+            }
+          );
+        })
+        .catch((error) => {
+          console.log(error.response.data);
+        });
       responseData.message = "Status changed to for sale";
       responseData.status = true;
       responseData.data = null
@@ -610,15 +639,38 @@ const changeStatusToNotForSale = async (req,res)=>{
       }
     );
     if(productExist){
-      await models.productStorage.update(
+      const inventory = await models.inventory.findOne(
         {
-          isForSale:false
-        },{
           where:{
-            id:storageId
+            productStorageId:storageId
           }
         }
-      );
+      )
+      wooCommerce.delete(`products/${inventory.wooCommerceProductId}`, {
+        force: true
+      })
+        .then(async (response) => {
+          console.log(response.data);
+          await models.productStorage.update(
+            {
+              isForSale:false
+            },{
+              where:{
+                id:storageId
+              }
+            }
+          );
+          await models.inventory.destroy(
+            {
+              where:{
+                productStorageId:storageId
+              }
+            }
+          )
+        })
+        .catch((error) => {
+          console.log(error.response.data);
+        });
       responseData.message = "Status Changed to not for sale";
       responseData.status = true;
       responseData.data = null
