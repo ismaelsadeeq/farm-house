@@ -23,7 +23,7 @@ module.exports = {
         allowNull:true,
         onDelete:'CASCADE',
         references:{
-          model:'catogories',
+          model:'categories',
           key:'id',
           as:'categoryId'
         }
