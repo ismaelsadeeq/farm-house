@@ -482,7 +482,37 @@ const getFarmerWallet = async (req,res)=>{
     }
   );
   if(isAdmin){
-    
+    const farmer = await models.farmer.findOne(
+      {
+        where:{
+          id:req.params.farmerId
+        }
+      }
+    );
+    if(farmer){
+      const wallet = await models.farmerWallet.findOne(
+        {
+          where:{
+            farmerId:farmer.id
+          }
+        }
+      );
+      if(!wallet){
+        responseData.message = "farmer does not have a sale";
+        responseData.status = true;
+        responseData.data = undefined;
+        return res.json(responseData);
+      }
+      responseData.message = "completed";
+      responseData.status = true;
+      responseData.data = wallet;
+      return res.json(responseData);
+    } else{
+      responseData.message = "incorrect farmer id";
+      responseData.status = false;
+      res.statusCode = 200
+      return res.json(responseData);
+    }
   } else{
     responseData.status = false;
     res.statusCode = 401
@@ -491,15 +521,31 @@ const getFarmerWallet = async (req,res)=>{
 }
 const getFarmerWalletUSSD = async (req,res)=>{
   const data = req.body;
-  const isUser = await models.farmer.findOne(
+  const farmer = await models.farmer.findOne(
     {
       where:{
         phoneNumber:data.phoneNumber
       }
     }
   );
-  if(!isUser){
-    
+  if(farmer){
+    const wallet = await models.farmerWallet.findOne(
+      {
+        where:{
+          farmerId:farmer.id
+        }
+      }
+    );
+    if(!wallet){
+      responseData.message = "farmer does not have a sale";
+      responseData.status = true;
+      responseData.data = undefined;
+      return res.json(responseData);
+    }
+    responseData.message = "completed";
+    responseData.status = true;
+    responseData.data = wallet;
+    return res.json(responseData);
   } else{
     responseData.status = false;
     res.statusCode = 401
@@ -507,7 +553,86 @@ const getFarmerWalletUSSD = async (req,res)=>{
   }
 }
 const farmerWidthrawMoney = async (req,res)=>{
-  
+  const user = req.user;
+  const amount = parseFloat(req.body.amount);
+  const isAdmin = await models.admin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin){
+    if(amount<0){
+      responseData.message = "cannot widthraw negative amount";
+      responseData.status = false;
+      res.statusCode = 200
+      return res.json(responseData);
+    }
+    const farmer = await models.farmer.findOne(
+      {
+        where:{
+          id:req.params.farmerId
+        }
+      }
+    );
+    if(farmer){
+      const wallet = await models.farmerWallet.findOne(
+        {
+          where:{
+            farmerId:farmer.id
+          }
+        }
+      );
+      if(!wallet){
+        responseData.message = "farmer doesnt have a sale yet";
+        responseData.status = false;
+        res.statusCode = 200
+        return res.json(responseData);
+      }
+      if(parseFloat(wallet.balance)<amount){
+        responseData.message = "insufficient funds";
+        responseData.status = false;
+        res.statusCode = 200
+        return res.json(responseData);
+      }
+      await models.wallet.update(
+        {
+          balance:parseFloat(wallet.balance) - amount
+        },
+        {
+          where:{
+            farmerIf:farmer.id
+          }
+        }
+      );
+      let time = new Date()
+      time = time.toLocaleString()
+      await models.transaction.create(
+        {
+          id:uuid.v4(),
+          farmerId:farmer.id,
+          transactionType:"debit",
+          amount:amount,
+          status:true,
+          time:time
+        }
+      );
+      responseData.message = "withdrawal successful";
+      responseData.status = false;
+      res.statusCode = 200
+      return res.json(responseData);
+    } else{
+      responseData.message = "incorrect farmer id";
+      responseData.status = false;
+      res.statusCode = 200
+      return res.json(responseData);
+    }
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Unauthorize");
+  }
 }
 module.exports = {
   nubanWebhook,

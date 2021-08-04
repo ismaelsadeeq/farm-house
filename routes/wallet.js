@@ -38,7 +38,7 @@ router.get('/commodities/:soldCommodityId',
   passport.authenticate('jwt',{session:false}),
   controller.getPurchasedCommodity
 );
-router.get('/farmer-wallet',
+router.get('/farmer-wallet/:farmerId',
   passport.authenticate('jwt',{session:false}),
   controller.getFarmerWallet
 );
@@ -46,11 +46,7 @@ router.get('/farmer-wallet-ussd',
   passport.authenticate('jwt',{session:false}),
   controller.getFarmerWalletUSSD
 );
-router.get('/farmer-wallet-ussd',
-  passport.authenticate('jwt',{session:false}),
-  controller.getFarmerWalletUSSD
-);
-router.get('/farmer-wallet-ussd',
+router.post('/farmer-withdraw/:farmerId',
   passport.authenticate('jwt',{session:false}),
   controller.farmerWidthrawMoney
 );

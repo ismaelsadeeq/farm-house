@@ -49,10 +49,7 @@ const createWebhook = async (req,res)=>{
 }
 
 const webhook = async (req,res)=> {
-  console.log(req.headers)
   const source = req.headers['x-wc-webhook-source']
-  console.log(source)
-  console.log(req.body);
   const topic = req.headers['x-wc-webhook-topic'];
   if(source == process.env.SOURCE){
     const data = req.body;
@@ -153,6 +150,16 @@ const webhook = async (req,res)=> {
             }
           )
         }
+        await models.transaction.create(
+          {
+            id:uuid.v4(),
+            farmerId:farmerId,
+            transactionType:"credit",
+            amount:purchasedProductPrice,
+            status:true,
+            time:time
+          }
+        );
       }
       responseData.status = 200;
       responseData.message = "completed";
