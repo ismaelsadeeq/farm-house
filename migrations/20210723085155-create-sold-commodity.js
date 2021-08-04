@@ -10,7 +10,7 @@ module.exports = {
       },
       userId: {
         type: Sequelize.UUID,
-        allowNull:false,
+        allowNull:true,
         onDelete:'CASCADE',
         references:{
           model:'users',
@@ -20,7 +20,7 @@ module.exports = {
       },
       inventoryId: {
         type: Sequelize.UUID,
-        allowNull:false,
+        allowNull:true,
         onDelete:'CASCADE',
         references:{
           model:'inventories',
@@ -30,7 +30,7 @@ module.exports = {
       },
       deliveryAddressId: {
         type: Sequelize.UUID,
-        allowNull:false,
+        allowNull:true,
         onDelete:'CASCADE',
         references:{
           model:'deliveryAddresses',
