@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
     transaction.belongsTo(models.user,{
       foreignKey:'userId'
     });
+    transaction.belongsTo(models.farmer,{
+      foreignKey:'farmerId'
+    });
   }
   transaction.init({
     transactionType: DataTypes.STRING,

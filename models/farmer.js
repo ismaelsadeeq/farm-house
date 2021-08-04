@@ -30,6 +30,9 @@ module.exports = (sequelize, DataTypes) => {
     farmer.hasOne(models.farmerWallet,{
       foreignKey:'farmerId'
     });
+    farmer.hasMany(models.transaction,{
+      foreignKey:'farmerId'
+    });
   }
   farmer.init({
     firstname: DataTypes.STRING,
