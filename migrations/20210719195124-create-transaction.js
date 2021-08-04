@@ -18,6 +18,16 @@ module.exports = {
           as:'userId'
         }
       },
+      farmerId: {
+        type: Sequelize.UUID,
+        allowNull:true,
+        onDelete:'CASCADE',
+        references:{
+          model:'farmers',
+          key:'id',
+          as:'farmerId'
+        }
+      },
       transactionType: {
         type: Sequelize.STRING
       },

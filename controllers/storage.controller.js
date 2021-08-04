@@ -546,7 +546,7 @@ const changeStatusToForSale = async (req,res)=>{
       }
     }
   );
-  if(!isUser){
+  if(isUser){
     const storageId = req.params.storageId;
     const productExist = await models.productStorage.findOne(
       {

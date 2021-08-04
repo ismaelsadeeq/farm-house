@@ -114,14 +114,6 @@ const nubanWebhook =async (req,res)=>{
   res.statusCode = 401;
 	return res.json('unauthorize')
 }
-const sendEmail= (data)=>{
-  const sendMail = mailer.sendMail(data.email, data.variables,data.msg)
- if(sendMail){
- return true
- } else{
-   return false
- }
-}
 const getBalanceWithToken = async (req,res)=>{
   const key = req.headers.authorization;
   const email = req.body.email;
@@ -480,6 +472,43 @@ const getPurchasedCommodity = async (req,res)=>{
   responseData.data = purchasedCommodity;
   return res.json(responseData);
 }
+const getFarmerWallet = async (req,res)=>{
+  const user = req.user;
+  const isAdmin = await models.admin.findOne(
+    {
+      where:{
+        id:user.id
+      }
+    }
+  );
+  if(isAdmin){
+    
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Unauthorize");
+  }
+}
+const getFarmerWalletUSSD = async (req,res)=>{
+  const data = req.body;
+  const isUser = await models.farmer.findOne(
+    {
+      where:{
+        phoneNumber:data.phoneNumber
+      }
+    }
+  );
+  if(!isUser){
+    
+  } else{
+    responseData.status = false;
+    res.statusCode = 401
+    return res.json("Unauthorize");
+  }
+}
+const farmerWidthrawMoney = async (req,res)=>{
+  
+}
 module.exports = {
   nubanWebhook,
   getBalanceWithToken,
@@ -490,5 +519,8 @@ module.exports = {
   getPurchasedCommodities,
   getPurchasedCommoditiesWithAPI,
   getPurchasedCommodityWithAPI,
-  getPurchasedCommodity
+  getPurchasedCommodity,
+  getFarmerWallet,
+  getFarmerWalletUSSD,
+  farmerWidthrawMoney
 }

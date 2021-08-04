@@ -35,7 +35,23 @@ router.get('/commodities-api/:soldCommodityId',
   controller.getPurchasedCommodityWithAPI
 );
 router.get('/commodities/:soldCommodityId',
-passport.authenticate('jwt',{session:false}),
+  passport.authenticate('jwt',{session:false}),
   controller.getPurchasedCommodity
+);
+router.get('/farmer-wallet',
+  passport.authenticate('jwt',{session:false}),
+  controller.getFarmerWallet
+);
+router.get('/farmer-wallet-ussd',
+  passport.authenticate('jwt',{session:false}),
+  controller.getFarmerWalletUSSD
+);
+router.get('/farmer-wallet-ussd',
+  passport.authenticate('jwt',{session:false}),
+  controller.getFarmerWalletUSSD
+);
+router.get('/farmer-wallet-ussd',
+  passport.authenticate('jwt',{session:false}),
+  controller.farmerWidthrawMoney
 );
 module.exports = router;
