@@ -7,6 +7,7 @@ const mailer = require("../utilities/mailjet");
 const helpers = require("../utilities/helpers");
 const paystackApi = require('../utilities/paystack.api');
 const crypto = require('crypto');
+const wooCommerce = require('../config/wooCommerce').WooCommerce;
 require("dotenv").config();
 const mailjet = require ("node-mailjet").connect(process.env.MAILJET_PUBLIC,process.env.MAILJET_PRIVATE);
 
@@ -285,8 +286,8 @@ const buyACommodity = async (req,res)=>{
   );
   if(!inventory){
     responseData.status = false;
-    responseData.message = "commodity with doesn't exist";
-    responseData.data = null
+    responseData.message = "commodity doesn't exist";
+    responseData.data = undefined
     return res.json(responseData);
   }
   let walletBalance = parseFloat(wallet.accountBalance);
@@ -322,6 +323,31 @@ const buyACommodity = async (req,res)=>{
       }
     }
   );
+  if(newNumberOfProduct == 0){
+    await models.inventory.destroy(
+      {
+        where:{
+          id:inventory.id
+        }
+      }
+    );
+    await productStorage.destroy(
+      {
+        where:{
+          id:inventory.productStorageId
+        }
+      }
+    );
+    wooCommerce.delete(`products/${inventory.wooCommerceProductId}` , {
+      force: true
+    })
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error.response);
+      });
+  }
   let date = new Date();
   date = date.toLocaleString();
   const createSoldProduct = await models.soldCommodity.create(
@@ -338,6 +364,32 @@ const buyACommodity = async (req,res)=>{
       time:date
     }
   );
+  const farmerWallet = await models.farmerWallet.findOne(
+    {
+      farmerId:inventory.farmerId
+    }
+  );
+  if(!farmerWallet){
+    let purchasedCommodityPrice =parseFloat(numberOfProduct) * parseFloat(inventory.pricePerUnit)
+    const createWallet = await models.farmerWallet.create(
+      {
+        id:uuid.v4(),
+        farmerId:inventory.farmerId,
+        balance:purchasedCommodityPrice
+      }
+    );
+  }else{
+    await models.wallet.update(
+      {
+        balance:parseFloat(wallet.balance) + purchasedCommodityPrice
+      },
+      {
+        where:{
+          farmerId:inventory.farmerId
+        }
+      }
+    )
+  }
   responseData.status = true;
   responseData.message = "commodity purchased successful";
   responseData.data = createSoldProduct;
