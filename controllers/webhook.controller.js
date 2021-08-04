@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 const helpers = require('../utilities/helpers');
 const smsGlobal = require('../utilities/sms.api');
-const wooCommerce = require('../config/wooCommerce').WooCommerce
+const wooCommerce = require('../config/wooCommerce').WooCommerce;
 
 require('dotenv').config();
 
@@ -48,18 +48,123 @@ const createWebhook = async (req,res)=>{
   }
 }
 
-const webhook = async (req,res)=>
-{
-  const source = req.headers['X-WC-Webhook-Source']
+const webhook = async (req,res)=> {
+  console.log(req.headers)
+  const source = req.headers['x-wc-webhook-source']
+  console.log(source)
+  console.log(req.body);
+  const topic = req.headers['x-wc-webhook-topic'];
   if(source == process.env.SOURCE){
-    const topic = req.headers['X-WC-Webhook-Source'];
-    if(topic == 'order.created'){
-      
+    const data = req.body;
+    if(topic === 'order.created' && data.status==='completed'){
+      const products = data.line_items;
+      for (let i = 0; i < products.length; i++) {
+        let inventory = await models.inventory.findOne(
+          {
+            where:{
+              wooCommerceProductId:products[i].product_id
+            }
+          }
+        );
+        const farmerId = inventory.farmerId;
+        let noOfProducts = parseFloat(inventory.numberOfProduct) - parseFloat(products[i].quantity);
+        let commulativePrice = noOfProducts * parseFloat(products[i].price);
+        if(noOfProducts<= 0 ){
+          await models.inventory.destroy(
+            {
+              where:{
+                id:inventory.id
+              }
+            }
+          );
+          await productStorage.destroy(
+            {
+              where:{
+                id:inventory.productStorageId
+              }
+            }
+          );
+          wooCommerce.delete(`products/${products[i].product_id}` , {
+            force: true
+          })
+            .then((response) => {
+              console.log(response.data);
+            })
+            .catch((error) => {
+              console.log(error.response);
+            });
+        } else {
+          await models.inventory.update(
+            {
+              numberOfProduct:noOfProducts,
+              cummulativeProductPrice:commulativePrice
+            },
+            {
+              where:{
+                id:inventory.id
+              }
+            }
+          );
+          await models.productStorage.update(
+            {
+              numberOfProduct:noOfProducts
+            },
+            {
+              where:{
+                id:inventory.productStorageId
+              }
+            }
+          );
+        }
+        let purchasedProductPrice = parseFloat(products[i].quantity) * parseFloat(products[i].price);
+        let time = new Date();
+        time = time.toLocaleString()
+        const createSoldProduct = await models.soldCommodity.create(
+          {
+            id:uuid.v4(),
+            productName:products[i].name,
+            numberOfProduct:products[i].quantity,
+            productUnit:inventory.productUnit,
+            pricePerUnit:products[i].price,
+            cummulativeProductPrice:purchasedProductPrice,
+            time:time,
+            isDelivered:true
+          }
+        );
+        const wallet = await models.farmerWallet.findOne(
+          {
+            where:{
+              farmerId:farmerId
+            }
+          }
+        );
+        if(!wallet){
+          const createWallet = await models.farmerWallet.create(
+            {
+              id:uuid.v4(),
+              farmerId:farmerId,
+              balance:purchasedProductPrice,
+            }
+          )
+        }else{
+          await models.farmerWallet.update(
+            {
+              balance:parseFloat(wallet.balance) + parseFloat(purchasedProductPrice)
+            }
+          )
+        }
+      }
+      responseData.status = 200;
+      responseData.message = "completed";
+      return res.json(responseData);
     }
+    responseData.status = 200;
+    responseData.message = "inalid payload";
+    return res.json(responseData);
   }
-  responseData.status = false;
-  res.statusCode = 401
-  return res.json("Unauthorize");
+  responseData.status = true;
+  res.statusCode = 401;
+  return res.json("webhook works");
 }
 
 module.exports = {

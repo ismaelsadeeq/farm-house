@@ -566,7 +566,7 @@ const changeStatusToForSale = async (req,res)=>{
       )
       const payload = {
         name: productExist.productName,
-        type: productExist.unit,
+        type: "simple",
         regular_price: productExist.peggedPrice,
         short_description:`One ${productExist.unit} of ${productExist.productName} is ${productExist.peggedPrice}` ,
         categories: [
@@ -603,7 +603,7 @@ const changeStatusToForSale = async (req,res)=>{
           );
         })
         .catch((error) => {
-          console.log(error.response.data);
+          console.log(error.response);
         });
       responseData.message = "Status changed to for sale";
       responseData.status = true;
@@ -669,7 +669,7 @@ const changeStatusToNotForSale = async (req,res)=>{
           )
         })
         .catch((error) => {
-          console.log(error.response.data);
+          console.log(error.response);
         });
       responseData.message = "Status Changed to not for sale";
       responseData.status = true;
