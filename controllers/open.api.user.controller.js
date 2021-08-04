@@ -559,8 +559,6 @@ const editDeliveryAddress = async (req,res)=>{
   return res.json(responseData);
 }
 const deleteDeliveryAddress = async (req,res)=>{
-  const user = req.user;
-  const data = req.body;
   const id = req.params.id;
   const deleteAddress = await models.deliveryAddress.destroy(
     {
@@ -607,8 +605,6 @@ const getDeliveryAddresses = async (req,res)=>{
   return res.json(responseData);
 }
 const getDeliveryAddress = async (req,res)=>{
-  const user = req.user;
-  const data = req.body;
   const id = req.params.id;
   const address = await models.deliveryAddress.findOne(
     {
