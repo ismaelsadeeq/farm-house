@@ -74,7 +74,7 @@ const webhook = async (req,res)=> {
               }
             }
           );
-          await productStorage.destroy(
+          await models.productStorage.destroy(
             {
               where:{
                 id:inventory.productStorageId
@@ -144,9 +144,15 @@ const webhook = async (req,res)=> {
             }
           )
         }else{
+          console.log(wallet.balance)
           await models.farmerWallet.update(
             {
               balance:parseFloat(wallet.balance) + parseFloat(purchasedProductPrice)
+            },
+            {
+              where:{
+              farmerId:farmerId
+              }
             }
           )
         }

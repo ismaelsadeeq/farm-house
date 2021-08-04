@@ -341,7 +341,7 @@ const buyACommodity = async (req,res)=>{
         }
       }
     );
-    await productStorage.destroy(
+    await models.productStorage.destroy(
       {
         where:{
           id:inventory.productStorageId
