@@ -332,7 +332,6 @@ const buyACommodity = async (req,res)=>{
   );
   let date = new Date();
   date = date.toLocaleString();
-  console.log()
   const createSoldProduct = await models.soldCommodity.create(
     {
       id:uuid.v4(),
