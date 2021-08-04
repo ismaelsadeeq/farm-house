@@ -172,12 +172,12 @@ const webhook = async (req,res)=> {
       return res.json(responseData);
     }
     responseData.status = 200;
-    responseData.message = "inalid payload";
+    responseData.message = "invalid payload";
     return res.json(responseData);
   }
   responseData.status = true;
   res.statusCode = 401;
-  return res.json("webhook works");
+  return res.send("Unauthorize");
 }
 
 module.exports = {
