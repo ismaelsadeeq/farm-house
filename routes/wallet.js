@@ -43,7 +43,6 @@ router.get('/farmer-wallet/:farmerId',
   controller.getFarmerWallet
 );
 router.get('/farmer-wallet-ussd',
-  passport.authenticate('jwt',{session:false}),
   controller.getFarmerWalletUSSD
 );
 router.post('/farmer-withdraw/:farmerId',

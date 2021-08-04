@@ -652,19 +652,19 @@ const farmerWidthrawMoney = async (req,res)=>{
         res.statusCode = 200
         return res.json(responseData);
       }
-      if(parseFloat(wallet.balance)<amount){
+      if(parseFloat(wallet.balance) < amount){
         responseData.message = "insufficient funds";
         responseData.status = false;
         res.statusCode = 200
         return res.json(responseData);
       }
-      await models.wallet.update(
+      await models.farmerWallet.update(
         {
           balance:parseFloat(wallet.balance) - amount
         },
         {
           where:{
-            farmerIf:farmer.id
+            farmerId:farmer.id
           }
         }
       );
