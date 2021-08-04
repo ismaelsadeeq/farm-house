@@ -323,6 +323,16 @@ const buyACommodity = async (req,res)=>{
       }
     }
   );
+  await models.productStorage.update(
+    {
+      numberOfProduct:newNumberOfProduct
+    },
+    {
+      where:{
+        id:inventory.productStorageId
+      }
+    }
+  );
   if(newNumberOfProduct == 0){
     await models.inventory.destroy(
       {
@@ -369,8 +379,8 @@ const buyACommodity = async (req,res)=>{
       farmerId:inventory.farmerId
     }
   );
+  let purchasedCommodityPrice = parseFloat(numberOfProduct) * parseFloat(inventory.pricePerUnit)
   if(!farmerWallet){
-    let purchasedCommodityPrice =parseFloat(numberOfProduct) * parseFloat(inventory.pricePerUnit)
     const createWallet = await models.farmerWallet.create(
       {
         id:uuid.v4(),
